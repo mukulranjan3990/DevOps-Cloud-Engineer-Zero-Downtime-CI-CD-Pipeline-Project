@@ -90,16 +90,16 @@ The pipeline should also create an audit record showing:
 
 > Checks source code for security vulnerabilities and code-quality problems.
 
-*** Example Threshold ***
+**Example Threshold**
 
 * Critical vulnerabilities: 0
 * High vulnerabilities: <= 2
 * Coverage: >= 80%
 
-> *** PASS ***
+**PASS**
 > Pipeline continues.
 
-> *** FAIL ***
+**FAIL**
 > Pipeline is blocked.
 
 #### What to do after failure?
@@ -117,15 +117,15 @@ PCI-DSS 6.2
 > Checks application dependencies and container images for known security vulnerabilities.
  
 
-*** Example Threshold ***
+**Example Threshold**
 
 * No Critical vulnerabilities
 * High vulnerabilities must remain within the approved threshold
 
-*** PASS *** 
+**PASS** 
 > Pipeline continues.
 
-*** FAIL ***
+**FAIL**
 > Deployment is blocked.
 
 #### What to do after failure?
@@ -143,10 +143,10 @@ PCI-DSS 6.3
 > Checks whether third-party and open-source dependencies comply
 > with the project's allowed licence policy.
 
-*** PASS ***
+**PASS**
 > All dependencies comply with the approved licence policy.
 
-*** FAIL ***
+**FAIL**
 > Deployment is blocked or sent for an approved exception.
 
 #### What to do after failure?
@@ -162,10 +162,10 @@ RBI 7.2
 
 > Tests the running application for security vulnerabilities.
 
-*** PASS ***
+**PASS**
 > No unacceptable security findings.
 
-*** FAIL ***
+**FAIL**
 > Deployment is blocked or the issue is sent for remediation.
 
 #### What to do after failure?
@@ -184,7 +184,7 @@ PCI-DSS 11.3
 > Checks whether Kubernetes/deployment resources follow NovaPay's
 > security policies.
 
-*** Example policies: ***
+**Example policies:**
 
 * Privileged containers are not allowed
 * Required security settings must be present
@@ -194,10 +194,10 @@ PCI-DSS 11.3
 
 OPA / Rego or Kyverno.
 
-*** PASS ***
+**PASS**
 > Resources follow the required policies.
 
-*** FAIL ***
+**FAIL**
 > The deployment is rejected.
 
 #### What to do after failure?
@@ -216,17 +216,17 @@ PCI-DSS security/change controls
 
 > Checks infrastructure configuration for insecure settings.
 
-*** Examples: ***
+**Examples:**
 
 * Insecure network configuration
 * Missing encryption
 * Incorrect access configuration
 * Unsafe cloud configuration
 
-*** PASS ***
+**PASS**
 > Infrastructure follows the approved baseline.
 
-*** FAIL ***
+**FAIL**
 > Infrastructure deployment is blocked.
 
 #### What to do after failure?
@@ -240,7 +240,7 @@ RBI 4.2
 
 ## Additional Compliance Controls
 
-*** Audit Gate ***
+**Audit Gate**
 
 > Every important pipeline action should create an audit record.
 
@@ -259,7 +259,9 @@ RBI 4.2
 
 ---
 ---
+
 ## What Happens When a Gate Fails?
+```text
 
 
                 Gate
@@ -289,7 +291,8 @@ RBI 4.2
                Continue
 
 
-               
+```
+            
 The assessment specifically requires **6+ automated compliance gates**, each with thresholds, remediation, exception handling, 
 audit records and regulatory mapping. :contentReference[oaicite:3]{index=3} It also requires **3+ OPA/Rego policies** and a 
 compliance-gate orchestration diagram. :contentReference[oaicite:4]{index=4}
