@@ -2,11 +2,11 @@
 
 ## Project Information
 
-Name: Mukul Ranjan
-Track: DevOps & Cloud Engineer
-Project: Zero-Downtime CI/CD Pipeline with Compliance Gates
-Application: NovaPay Digital Bank
-Duration: 15 Days
++ Name: Mukul Ranjan
++ Track: DevOps & Cloud Engineer
++ Project: Zero-Downtime CI/CD Pipeline with Compliance Gates.
++ Application: NovaPay Digital Bank
++ Duration: 15 Days
 
 ## Project Overview
 

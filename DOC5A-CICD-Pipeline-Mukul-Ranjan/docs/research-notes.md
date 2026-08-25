@@ -12,7 +12,7 @@ Current problems:
 - 17 outstanding RBI audit non-conformances
 
 
-######                  A1 - DevOps in Regulated Banking              #######
+### A1 - DevOps in Regulated Banking            
 
 ## Key Concept
 
@@ -37,6 +37,38 @@ maintaining regulatory controls.
 - Five-nines availability
 - Rapid incident detection and recovery
 
+---
+
+# [RBI Rules - NovaPay CI/CD Compliance](RBI-IT-RISK-SECTION-4-7.md#rbi-rules---novapay-cicd-compliance-1)
+   
+   1. [RBI 4.2 - CHANGE MANAGMENT](RBI-IT-RISK-SECTION-4-7.md#rbi-42---change-management)
+   2. [RBI 4.3 - SEGREGATION OF DUTIES](RBI-IT-RISK-SECTION-4-7.md#rbi-43---segregation-of-duties)
+   3. [RBI 5.1 - VULNERABILITY ASSESSMENT](RBI-IT-RISK-SECTION-4-7.md#rbi-51---vulnerability-assessment)
+   4. [RBI 5.4 - ENCRYPTION](RBI-IT-RISK-SECTION-4-7.md#rbi-54---encryption)
+   5. [RBI 6.1 - AUDIT TRAIL](RBI-IT-RISK-SECTION-4-7.md#rbi-61---audit-trail)
+   6. [RBI 6.3 - INCIDENT MANAGMENT & BUISNESS CONTINUITY](RBI-IT-RISK-SECTION-4-7.md#rbi-63---incident-management--business-continuity)
+   7. [RBI 7.2 - THIRD-PARTY RISK](RBI-IT-RISK-SECTION-4-7.md#rbi-72---third-party-risk)
+
+---
+
+# [PCI-DSS Rules - NovaPay CI/CD Compliance](PCI-DSS-REQUIREMENTS.md#pci-dss-rules---novapay-cicd-compliance-1)
+   
+   1. [PCI-DSS 6.2 - SECURE SOFTWARE](PCI-DSS-REQUIREMENTS.md#pci-dss-62---secure-software)
+   2. [PCI-DSS 6.3 - VULNERABILITIES](PCI-DSS-REQUIREMENTS.md#pci-dss-63---vulnerabilities)
+   3. [PCI-DSS 6.4 - PUBLIC WEB APPLICATION PROTECTION](PCI-DSS-REQUIREMENTS.md#pci-dss-64---public-web-application-security)
+   4. [PCI-DSS 6.5 - CHANGE MANAGMENT](PCI-DSS-REQUIREMENTS.md#pci-dss-65---change-management)
+   5. [PCI-DSS 10.2 - AUDIT LOG](PCI-DSS-REQUIREMENTS.md#pci-dss-102---audit-logs)
+   6. [PCI-DSS 11.3 - PENETRATION TESTING](PCI-DSS-REQUIREMENTS.md#pci-dss-113---penetration-testing)
+   7. [PCI-DSS 12.6 - SECURITY AWARENESS](PCI-DSS-REQUIREMENTS.md#pci-dss-126---security-awareness)
+
+---
+
+# [NovaPay Compliance Gates](COMPLIANCE-GATE.md)
+
+
+---
+---
+
 ## Why Zero Downtime Matters
 
 Payment systems operate continuously.
@@ -53,7 +85,7 @@ Build a CI/CD platform that allows NovaPay to:
 5. Roll back automatically when required
 6. Maintain complete deployment evidence
 
-###### some important questioni of the day 1 #######
+### some important questioni of the day 1 
 
 1. Why does NovaPay need a special CI/CD pipeline instead of a normal DevOps pipeline?
    
@@ -101,7 +133,7 @@ Traffic gradually moved
 Rollback if unhealthy
 
 
-##### next steps: #####
+## next steps: 
 
 A2 = HOW the CI/CD pipeline works
 A3 = HOW to deploy without downtime
@@ -111,7 +143,7 @@ A6 = HOW to operate and respond to incidents
 A7 = WHERE to learn these technologies
 
 
-######                    A2 - CI/CD Pipeline Fundamentals                    ######
+###    A2 - CI/CD Pipeline Fundamentals                   
 
 
 ## 1. What is CI/CD?
