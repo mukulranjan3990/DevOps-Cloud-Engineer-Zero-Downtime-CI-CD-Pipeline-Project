@@ -231,6 +231,9 @@ The deployment should support:
 - smoke tests
 - automated rollback
 
+
+--- 
+
 ## 4. Branching Strategy
 
 NovaPay should use a simple branching approach such as
@@ -287,6 +290,7 @@ or compliance check fails.
 
 
 ## SECTION A7: LEARNING RESOURCES (ALL FREE)
+
 ---
 ---
 ### Video Resources
@@ -302,6 +306,7 @@ min)
 * YouTube: “OPA / Rego Policy Language Tutorial” by Styra (2 hours)
 
 ---
+
 ### Documentation & Reading
 
 * DORA State of DevOps Report 2024 - https://dora.dev
@@ -316,6 +321,7 @@ min)
 * Kubernetes documentation - https://kubernetes.io/docs
 
 ---
+
 ### Hands-On Practice
 
 * Killercoda Kubernetes scenarios (free, browser-based) - https://killercoda.com
