@@ -12,11 +12,7 @@ Current problems:
 - 17 outstanding RBI audit non-conformances
 
 
-<<<<<<< HEAD
-######                  A1 - DevOps in Regulated Banking              #######
-=======
 ### A1 - DevOps in Regulated Banking            
->>>>>>> regular
 
 ## Key Concept
 
@@ -41,8 +37,6 @@ maintaining regulatory controls.
 - Five-nines availability
 - Rapid incident detection and recovery
 
-<<<<<<< HEAD
-=======
 ---
 
 # [RBI Rules - NovaPay CI/CD Compliance](RBI-IT-RISK-SECTION-4-7.md#rbi-rules---novapay-cicd-compliance-1)
@@ -75,7 +69,6 @@ maintaining regulatory controls.
 ---
 ---
 
->>>>>>> regular
 ## Why Zero Downtime Matters
 
 Payment systems operate continuously.
@@ -92,11 +85,7 @@ Build a CI/CD platform that allows NovaPay to:
 5. Roll back automatically when required
 6. Maintain complete deployment evidence
 
-<<<<<<< HEAD
-###### some important questioni of the day 1 #######
-=======
 ### some important questioni of the day 1 
->>>>>>> regular
 
 1. Why does NovaPay need a special CI/CD pipeline instead of a normal DevOps pipeline?
    
@@ -144,11 +133,7 @@ Traffic gradually moved
 Rollback if unhealthy
 
 
-<<<<<<< HEAD
-##### next steps: #####
-=======
 ## next steps: 
->>>>>>> regular
 
 A2 = HOW the CI/CD pipeline works
 A3 = HOW to deploy without downtime
@@ -158,11 +143,7 @@ A6 = HOW to operate and respond to incidents
 A7 = WHERE to learn these technologies
 
 
-<<<<<<< HEAD
-######                    A2 - CI/CD Pipeline Fundamentals                    ######
-=======
 ###    A2 - CI/CD Pipeline Fundamentals                   
->>>>>>> regular
 
 
 ## 1. What is CI/CD?
@@ -250,6 +231,9 @@ The deployment should support:
 - smoke tests
 - automated rollback
 
+
+--- 
+
 ## 4. Branching Strategy
 
 NovaPay should use a simple branching approach such as
@@ -300,15 +284,13 @@ Verify
 Production
 
 The pipeline should stop when an important quality, security,
-<<<<<<< HEAD
-or compliance check fails.
-=======
 or compliance check fails.
 
 
 
 
 ## SECTION A7: LEARNING RESOURCES (ALL FREE)
+
 ---
 ---
 ### Video Resources
@@ -324,6 +306,7 @@ min)
 * YouTube: “OPA / Rego Policy Language Tutorial” by Styra (2 hours)
 
 ---
+
 ### Documentation & Reading
 
 * DORA State of DevOps Report 2024 - https://dora.dev
@@ -338,6 +321,7 @@ min)
 * Kubernetes documentation - https://kubernetes.io/docs
 
 ---
+
 ### Hands-On Practice
 
 * Killercoda Kubernetes scenarios (free, browser-based) - https://killercoda.com
@@ -345,4 +329,3 @@ min)
 * Play with Kubernetes - https://labs.play-with-k8s.com (free 4-hour sessions)
 * SonarCloud (free for open-source) - https://sonarcloud.io
 * OWASP WebGoat (practice DAST scanning) - https://owasp.org/www-project-webgoat/
->>>>>>> regular

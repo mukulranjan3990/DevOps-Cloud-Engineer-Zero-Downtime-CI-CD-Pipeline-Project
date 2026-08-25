@@ -4,8 +4,6 @@ This document maps specific Payment Card Industry Data Security Standard (PCI DS
 
 ---
 
-<<<<<<< HEAD
-=======
 # [PCI-DSS Rules - NovaPay CI/CD Compliance](#pci-dss-rules---novapay-cicd-compliance-1)
    
    1. [PCI-DSS 6.2 - SECURE SOFTWARE](#pci-dss-62---secure-software)
@@ -19,7 +17,6 @@ This document maps specific Payment Card Industry Data Security Standard (PCI DS
 ---
    
 
->>>>>>> regular
 ## 🛠️ Requirement 6.2: Patch & Vulnerability Management
 1. **What it means in simple terms:** Keep all software, systems, and dependencies updated so known security bugs cannot be    
    exploited.
@@ -151,8 +148,6 @@ pull-request pipelines to parse your package files (`package.json`, `requirement
 
 3. **Automated Infrastructure Compliance Checks:** Run tools like `Checkov` or `tfsec` in your deployment pipelines to evaluate 
    your cloud architecture code against strict security standards before anything is provisioned in production.
-<<<<<<< HEAD
-=======
 
 
 
@@ -488,4 +483,3 @@ software changes are:
 - Controlled
 - Auditable
 - Traceable
->>>>>>> regular
