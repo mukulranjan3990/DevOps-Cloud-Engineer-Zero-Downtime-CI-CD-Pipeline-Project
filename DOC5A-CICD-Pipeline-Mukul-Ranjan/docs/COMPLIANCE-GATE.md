@@ -104,12 +104,13 @@ The pipeline should also create an audit record showing:
 
 #### What to do after failure?
 
-Developer fixes the reported problems and runs the pipeline again.
+> Developer fixes the reported problems and runs the pipeline again.
 
-Regulatory Mapping
-RBI 5.1
-PCI-DSS 6.2
++ Regulatory Mapping
++ RBI 5.1
++ PCI-DSS 6.2
 
+---
 
 ## Gate 2 - Dependency / Container Scan
 > What does it check?
@@ -130,11 +131,11 @@ PCI-DSS 6.2
 
 #### What to do after failure?
 
-Upgrade, replace or remove the vulnerable dependency/image.
+> Upgrade, replace or remove the vulnerable dependency/image.
 
-Regulatory Mapping
-RBI 5.1
-PCI-DSS 6.3
++ Regulatory Mapping
++ RBI 5.1
++ PCI-DSS 6.3
 
 
 ## Gate 3 - Licence Compliance
@@ -151,10 +152,10 @@ PCI-DSS 6.3
 
 #### What to do after failure?
 
-Replace the dependency or obtain the required approval.
+> Replace the dependency or obtain the required approval.
 
-Regulatory Mapping
-RBI 7.2
++ Regulatory Mapping
++ RBI 7.2
 
 
 ## Gate 4 - DAST
@@ -170,12 +171,12 @@ RBI 7.2
 
 #### What to do after failure?
 
-Fix the application vulnerability and repeat the security test.
+> Fix the application vulnerability and repeat the security test.
 
-Regulatory Mapping
-RBI 5.1
-PCI-DSS 6.4
-PCI-DSS 11.3
++ Regulatory Mapping
++ RBI 5.1
++ PCI-DSS 6.4
++ PCI-DSS 11.3
 
 
 ## Gate 5 - Policy Compliance
@@ -202,13 +203,13 @@ OPA / Rego or Kyverno.
 
 #### What to do after failure?
 
-repeat it before check the mapping.
+> repeat it before check the mapping.
 
 
-Regulatory Mapping
-RBI 4.2
-RBI 5.4
-PCI-DSS security/change controls
++ Regulatory Mapping
++ RBI 4.2
++ RBI 5.4
++ PCI-DSS security/change controls
 
 
 ## Gate 6 - Infrastructure Compliance
@@ -231,11 +232,11 @@ PCI-DSS security/change controls
 
 #### What to do after failure?
 
-Fix the infrastructure configuration and run the checks again.
+> Fix the infrastructure configuration and run the checks again.
 
-Regulatory Mapping
-RBI 5.4
-RBI 4.2
++ Regulatory Mapping
++ RBI 5.4
++ RBI 4.2
 
 
 ## Additional Compliance Controls
@@ -292,7 +293,7 @@ RBI 4.2
 
 
 ```
-            
+
 The assessment specifically requires **6+ automated compliance gates**, each with thresholds, remediation, exception handling, 
 audit records and regulatory mapping. :contentReference[oaicite:3]{index=3} It also requires **3+ OPA/Rego policies** and a 
 compliance-gate orchestration diagram. :contentReference[oaicite:4]{index=4}
