@@ -20,6 +20,7 @@ The pipeline should also create an audit record showing:
 
 ---
 
+
 # Compliance Gate Flow
 
 ```text
@@ -80,7 +81,185 @@ The pipeline should also create an audit record showing:
                  v           v
              Production   Recovery
 
+```
 
+---
+
+## Gate 1 - SAST
+> What does it check?
+
+> Checks source code for security vulnerabilities and code-quality problems.
+
+*** Example Threshold ***
+
+* Critical vulnerabilities: 0
+* High vulnerabilities: <= 2
+* Coverage: >= 80%
+
+> *** PASS ***
+> Pipeline continues.
+
+> *** FAIL ***
+> Pipeline is blocked.
+
+#### What to do after failure?
+
+Developer fixes the reported problems and runs the pipeline again.
+
+Regulatory Mapping
+RBI 5.1
+PCI-DSS 6.2
+
+
+## Gate 2 - Dependency / Container Scan
+> What does it check?
+
+> Checks application dependencies and container images for known security vulnerabilities.
+ 
+
+*** Example Threshold ***
+
+* No Critical vulnerabilities
+* High vulnerabilities must remain within the approved threshold
+
+*** PASS *** 
+> Pipeline continues.
+
+*** FAIL ***
+> Deployment is blocked.
+
+#### What to do after failure?
+
+Upgrade, replace or remove the vulnerable dependency/image.
+
+Regulatory Mapping
+RBI 5.1
+PCI-DSS 6.3
+
+
+## Gate 3 - Licence Compliance
+> What does it check?
+
+> Checks whether third-party and open-source dependencies comply
+> with the project's allowed licence policy.
+
+*** PASS ***
+> All dependencies comply with the approved licence policy.
+
+*** FAIL ***
+> Deployment is blocked or sent for an approved exception.
+
+#### What to do after failure?
+
+Replace the dependency or obtain the required approval.
+
+Regulatory Mapping
+RBI 7.2
+
+
+## Gate 4 - DAST
+> What does it check?
+
+> Tests the running application for security vulnerabilities.
+
+*** PASS ***
+> No unacceptable security findings.
+
+*** FAIL ***
+> Deployment is blocked or the issue is sent for remediation.
+
+#### What to do after failure?
+
+Fix the application vulnerability and repeat the security test.
+
+Regulatory Mapping
+RBI 5.1
+PCI-DSS 6.4
+PCI-DSS 11.3
+
+
+## Gate 5 - Policy Compliance
+> What does it check?
+
+> Checks whether Kubernetes/deployment resources follow NovaPay's
+> security policies.
+
+*** Example policies: ***
+
+* Privileged containers are not allowed
+* Required security settings must be present
+* Required labels must exist
+* Insecure configurations are rejected
+* Tool
+
+OPA / Rego or Kyverno.
+
+*** PASS ***
+> Resources follow the required policies.
+
+*** FAIL ***
+> The deployment is rejected.
+
+#### What to do after failure?
+
+repeat it before check the mapping.
+
+
+Regulatory Mapping
+RBI 4.2
+RBI 5.4
+PCI-DSS security/change controls
+
+
+## Gate 6 - Infrastructure Compliance
+> What does it check?
+
+> Checks infrastructure configuration for insecure settings.
+
+*** Examples: ***
+
+* Insecure network configuration
+* Missing encryption
+* Incorrect access configuration
+* Unsafe cloud configuration
+
+*** PASS ***
+> Infrastructure follows the approved baseline.
+
+*** FAIL ***
+> Infrastructure deployment is blocked.
+
+#### What to do after failure?
+
+Fix the infrastructure configuration and run the checks again.
+
+Regulatory Mapping
+RBI 5.4
+RBI 4.2
+
+
+## Additional Compliance Controls
+
+*** Audit Gate ***
+
+> Every important pipeline action should create an audit record.
+
+#### Record:
+
+* Actor
+* Commit SHA
+* Build ID
+* Artifact version
+* Security results
+* Approval
+* Deployment time
+* Deployment environment
+* Final result
+
+
+---
+---
+## What Happens When a Gate Fails?
 
 
                 Gate

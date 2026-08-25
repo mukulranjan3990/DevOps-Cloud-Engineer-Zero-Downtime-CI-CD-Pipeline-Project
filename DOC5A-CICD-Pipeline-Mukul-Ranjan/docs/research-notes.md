@@ -282,3 +282,44 @@ Production
 
 The pipeline should stop when an important quality, security,
 or compliance check fails.
+
+
+
+
+## SECTION A7: LEARNING RESOURCES (ALL FREE)
+---
+---
+### Video Resources
+
+* YouTube: “CI/CD Pipeline Tutorial for Beginners” by TechWorld with Nana (2.5 hours)
+* YouTube: “Kubernetes Deployment Strategies Explained” by Viktor Farcic (45 min)
+* YouTube: “Blue-Green Deployments on Kubernetes with Istio” by Google Cloud (30
+min)
+* YouTube: “DevSecOps Full Course” by freeCodeCamp (6 hours)
+* YouTube: “Prometheus and Grafana Tutorial” by TechWorld with Nana (3 hours)
+* YouTube: “GitHub Actions Full Course” by freeCodeCamp (5 hours)
+* YouTube: “Terraform Full Course” by HashiCorp (4 hours)
+* YouTube: “OPA / Rego Policy Language Tutorial” by Styra (2 hours)
+
+---
+### Documentation & Reading
+
+* DORA State of DevOps Report 2024 - https://dora.dev
+* Accelerate (book) by Nicole Forsgren, Jez Humble, Gene Kim
+* The Phoenix Project (book) by Gene Kim, Kevin Behr, George Spafford
+* GitHub Actions documentation - https://docs.github.com/en/actions
+* ArgoCD documentation - https://argo-cd.readthedocs.io
+* OPA Policy Language (Rego) - https://www.openpolicyagent.org/docs
+* PCI-DSS v4.0 Quick Reference - https://www.pcisecuritystandards.org
+* RBI Master Direction on IT Governance - https://rbi.org.in
+* OWASP Top 10 (2021) - https://owasp.org/Top10/
+* Kubernetes documentation - https://kubernetes.io/docs
+
+---
+### Hands-On Practice
+
+* Killercoda Kubernetes scenarios (free, browser-based) - https://killercoda.com
+* GitHub Skills learning paths - https://skills.github.com
+* Play with Kubernetes - https://labs.play-with-k8s.com (free 4-hour sessions)
+* SonarCloud (free for open-source) - https://sonarcloud.io
+* OWASP WebGoat (practice DAST scanning) - https://owasp.org/www-project-webgoat/
