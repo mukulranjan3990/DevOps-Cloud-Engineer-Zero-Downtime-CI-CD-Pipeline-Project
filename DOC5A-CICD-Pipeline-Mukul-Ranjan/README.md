@@ -43,7 +43,7 @@ pipeline for NovaPay Digital Bank.
 
 
 ## Refrence git repo structure 
-
+```
 Project1A-DevOps&CloudEngineer-YourName
 │
 ├── README.md
@@ -97,67 +97,65 @@ Project1A-DevOps&CloudEngineer-YourName
 │
 └── evidence/
     └── screenshots/
+```
 
 
-### Actuall git repo structure
 
-Project1A-DevOps&CloudEngineer-YourName-YourName/
+
+### Actual Project Repository Structure
+
+<pre>
+Project1A-DevOps&CloudEngineer-YourName/
 │
-├── [README.md](README.md)
-├── [ERRATA.md](ERRATA.md)
+├── <a href="README.md">README.md</a>
+├── <a href="ERRATA.md">ERRATA.md</a>
 │
-├── [docs/](docs)
-│   ├── [research-notes.md](reasearch-notes.md)
+├── <a href="docs">docs/</a>
+│   ├── <a href="docs/research-notes.md">research-notes.md</a>
 │   │
-│   ├── [01-pipeline-architecture/](docs/01-pipeline-architecture)
-│   │   ├── [architecture.md](docs/01-pipeline-architecture/architecture.md)
-│   │   └── [diagrams/](docs/01-pipeline-architecture/diagrams)
-│   │   └── [stage-details/](docs/01-pipeline-architecture/stage-details)
-|   |    
-│   ├── [02-deployment-strategies/](docs/02-deployment-strategies)
+│   ├── <a href="docs/01-pipeline-architecture">01-pipeline-architecture/</a>
+│   │   ├── <a href="docs/01-pipeline-architecture/architecture.md">architecture.md</a>
+│   │   ├── <a href="docs/01-pipeline-architecture/diagrams">diagrams/</a>
+│   │   └── <a href="docs/01-pipeline-architecture/stage-details">stage-details/</a>
 │   │
-│   ├── [03-compliance-gates/](docs/03-compliance-gates)
-│   │
-│   ├── [04-database-migration/](docs/04-database-migration/)
-│   │
-│   ├── [05-environment-promotion/](docs/05-environment-promotion/)
-│   │
-│   ├── [06-rollback-specification/](docs/06-rollback-specification/)
-│   │
-│   ├── [07-runbook-playbook/](docs/07-runbook-playbook/)
-│   │
-│   └── [08-observability/](docs/08-observability/)
+│   ├── <a href="docs/02-deployment-strategies">02-deployment-strategies/</a>
+│   ├── <a href="docs/03-compliance-gates">03-compliance-gates/</a>
+│   ├── <a href="docs/04-database-migration">04-database-migration/</a>
+│   ├── <a href="docs/05-environment-promotion">05-environment-promotion/</a>
+│   ├── <a href="docs/06-rollback-specification">06-rollback-specification/</a>
+│   ├── <a href="docs/07-runbook-playbook">07-runbook-playbook/</a>
+│   └── <a href="docs/08-observability">08-observability/</a>
 │
-├── [pipeline/](pipeline)
-│   ├── [jenkins/](pipeline/jenkins/)
-│   │   └── [Jenkinsfile](pipeline/jenkins/Jenkinsfile)
-|   |
-│   ├── [.github/](pipeline/.github/)
-|   |   └── [workflows](pipeline/.github/workflows/)
+├── <a href="pipeline">pipeline/</a>
+│   ├── <a href="pipeline/jenkins">jenkins/</a>
+│   │   └── <a href="pipeline/jenkins/Jenkinsfile">Jenkinsfile</a>
 │   │
-│   ├── [terraform/](pipeline/terraform/)
-│   │   ├── [modules/](pipeline/terraform/modules/)
-│   │   ├── [dev/](pipeline/terraform/dev/)
-│   │   ├── [staging/](pipeline/terraform/staging/)
-│   │   └── [production/](pipeline/terraform/production/)
+│   ├── <a href="pipeline/.github">.github/</a>
+│   │   └── <a href="pipeline/.github/workflows">workflows/</a>
 │   │
-│   ├── [kubernetes/](pipeline/kubernetes/)
-│   │   ├── [base/](pipeline/kubernetes/base/)
-│   │   └── [overlays/](pipeline/kubernetes/overlays/)
+│   ├── <a href="pipeline/terraform">terraform/</a>
+│   │   ├── <a href="pipeline/terraform/modules">modules/</a>
+│   │   ├── <a href="pipeline/terraform/dev">dev/</a>
+│   │   ├── <a href="pipeline/terraform/staging">staging/</a>
+│   │   └── <a href="pipeline/terraform/production">production/</a>
 │   │
-│   ├── [argocd/](pipeline/argocd/)
-│   │   └── [applications/](pipeline/argocd/applications/)
+│   ├── <a href="pipeline/kubernetes">kubernetes/</a>
+│   │   ├── <a href="pipeline/kubernetes/base">base/</a>
+│   │   └── <a href="pipeline/kubernetes/overlays">overlays/</a>
 │   │
-│   ├── [docker/](pipeline/docker/)
-│   │   └── [Dockerfile](pipeline/docker/Dockerfile)
+│   ├── <a href="pipeline/argocd">argocd/</a>
+│   │   └── <a href="pipeline/argocd/applications">applications/</a>
 │   │
-│   ├── [ansible/](pipeline/ansible/)
+│   ├── <a href="pipeline/docker">docker/</a>
+│   │   └── <a href="pipeline/docker/Dockerfile">Dockerfile</a>
 │   │
-│   └── [scripts/](pipeline/scripts/)
+│   ├── <a href="pipeline/ansible">ansible/</a>
+│   └── <a href="pipeline/scripts">scripts/</a>
 │
-├── [dashboards/](dashboards)
-│   └── [grafana/](dashboards/grafana/)
+├── <a href="dashboards">dashboards/</a>
+│   └── <a href="dashboards/grafana">grafana/</a>
 │
-└── [runbooks/](runbooks)
-    ├── deployment-runbook.md
-    └── incident-playbook.md
+└── <a href="runbooks">runbooks/</a>
+    ├── <a href="runbooks/deployment-runbook.md">deployment-runbook.md</a>
+    └── <a href="runbooks/incident-playbook.md">incident-playbook.md</a>
+</pre>
