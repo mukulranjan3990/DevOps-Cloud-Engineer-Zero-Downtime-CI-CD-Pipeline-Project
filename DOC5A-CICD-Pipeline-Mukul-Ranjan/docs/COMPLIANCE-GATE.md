@@ -323,16 +323,16 @@ compliance-gate orchestration diagram. :contentReference[oaicite:4]{index=4}
 
 ---
 
-## Your A4 folder will now look like this
+## This A4 folder will now look like this
 
-```text
+
 DOC5A-CICD-Pipeline-NovaPay/
 │
 ├── docs/
-│   ├── research-notes.md
-│   ├── RBI-RULES.md
-│   ├── PCI-DSS-RULES.md
-│   └── COMPLIANCE-GATE.md
+│   ├── [research-notes.md](./research-notes.md)
+│   ├── [RBI-IT-RISK-SECTION-4-7.md](.RBI-IT-RISK-SECTION-4-7.md)
+│   ├── [PCI-DSS-REQUIREMENTS.md](.PCI-DSS-REQUIREMENTS.md)
+│   └── [COMPLIANCE-GATE.md](.COMPLIANCE-GATE.md)
 │
 ├── .github/
 │   └── workflows/
@@ -354,7 +354,7 @@ checks inside our CI/CD pipeline?"
 
 
 
-```
+
 ### Compliance Gate Table Information.
 
 
