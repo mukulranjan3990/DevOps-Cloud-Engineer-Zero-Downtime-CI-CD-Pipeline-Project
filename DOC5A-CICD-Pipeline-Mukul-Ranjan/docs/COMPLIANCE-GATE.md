@@ -110,6 +110,9 @@ The pipeline should also create an audit record showing:
 + RBI 5.1
 + PCI-DSS 6.2
 
+#### Tool
+> SonarQube
+
 ---
 
 ## Gate 2 - Dependency / Container Scan
@@ -137,6 +140,10 @@ The pipeline should also create an audit record showing:
 + RBI 5.1
 + PCI-DSS 6.3
 
+#### Tool
+> Trivy
+
+---
 
 ## Gate 3 - Licence Compliance
 > What does it check?
@@ -157,6 +164,10 @@ The pipeline should also create an audit record showing:
 + Regulatory Mapping
 + RBI 7.2
 
+#### Tools
+> FOSSA/Scancode
+
+---
 
 ## Gate 4 - DAST
 > What does it check?
@@ -178,6 +189,10 @@ The pipeline should also create an audit record showing:
 + PCI-DSS 6.4
 + PCI-DSS 11.3
 
+#### Tool
+> OWASP ZAP
+
+---
 
 ## Gate 5 - Policy Compliance
 > What does it check?
@@ -211,6 +226,10 @@ OPA / Rego or Kyverno.
 + RBI 5.4
 + PCI-DSS security/change controls
 
+#### Tool
+> OPA/Kyver no
+
+---
 
 ## Gate 6 - Infrastructure Compliance
 > What does it check?
@@ -238,6 +257,10 @@ OPA / Rego or Kyverno.
 + RBI 5.4
 + RBI 4.2
 
+#### Tools
+> checkov/Terrraform
+
+---
 
 ## Additional Compliance Controls
 
@@ -330,3 +353,16 @@ COMPLIANCE-GATE.md
 checks inside our CI/CD pipeline?"
 
 
+
+```
+### Compliance Gate Table Information.
+
+
+| Gate | Tool | Threshold | On Failure | Exception Process |
+| :--- | :--- | :--- | :--- | :--- |
+| **SAST** | SonarQube | 0 Critical, ≤2 High, ≥80% coverage | Pipeline blocked, auto-ticket | CISO approval within 24h |
+| **DAST** | OWASP ZAP | 0 Critical/High from OWASP Top 10 | Pipeline blocked | Risk acceptance form + TRC |
+| **Dependency** | Trivy | 0 Critical CVE, SBOM generated | Pipeline blocked if CVSS ≥9.0 | 72h remediation window |
+| **License** | FOSSA / Scancode | No GPL/AGPL/SSPL dependencies | Legal review triggered | Legal team sign-off |
+| **Policy** | OPA / Kyverno | All K8s policies pass | Deployment rejected | Dual approval override |
+| **Infra** | Checkov / Terraform | No privileged containers, limits set | PR blocked | Tech Lead exemption |

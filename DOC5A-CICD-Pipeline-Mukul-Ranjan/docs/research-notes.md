@@ -288,11 +288,12 @@ or compliance check fails.
 
 
 
+---
+---
 
 ## SECTION A7: LEARNING RESOURCES (ALL FREE)
+--- 
 
----
----
 ### Video Resources
 
 * YouTube: “CI/CD Pipeline Tutorial for Beginners” by TechWorld with Nana (2.5 hours)
