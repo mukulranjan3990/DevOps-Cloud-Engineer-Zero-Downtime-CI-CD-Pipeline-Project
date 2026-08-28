@@ -122,15 +122,15 @@ Project1A-DevOps&CloudEngineer-YourName/
 │   │   ├── <a href="docs/01-pipeline-architecture/architecture.md">architecture.md</a>
 |   |   | 
 │   │   ├── <a href="docs/01-pipeline-architecture/diagrams">diagrams/</a>
-|   |   |   ├── <a href="novapay-pipeline-architecture-v1.drawio">novapay-pipeline-architecture-v1.drawio</a>
-|   |   |   └── <a href="novapay-pipeline-architecture-v1.png">novapay-pipeline-architecture-v1.png</a>
+|   |   |   ├── <a href="docs/01-pipeline-architecture/diagrams/novapay-pipeline-architecture-v1.drawio">novapay-pipeline-architecture-v1.drawio</a>
+|   |   |   └── <a href="docs/01-pipeline-architecture/diagrams/novapay-pipeline-architecture-v1.png">novapay-pipeline-architecture-v1.png</a>
 |   |   |    
 │   │   └── <a href="docs/01-pipeline-architecture/stage-details">stage-details/</a>
-|   |       └── <a href="pipeline-stage-specifications.md">pipeline-stage-specifications.md</a>
+|   |       └── <a href="docs/01-pipeline-architecture/stage-details/pipeline-stage-specifications.md">pipeline-stage-specifications.md</a>
 │   │
 │   ├── <a href="docs/02-deployment-strategies">02-deployment-strategies/</a>
 │   ├── <a href="docs/03-compliance-gates">03-compliance-gates/</a>
-│   |   └── <a href="docs/COMPLIANCE-GATE.md">COMPLIANCE-GATE.md</a>
+│   |   └── <a href="docs/03-compliance-gates/COMPLIANCE-GATE.md">COMPLIANCE-GATE.md</a>
 |   |
 │   ├── <a href="docs/04-database-migration">04-database-migration/</a>
 │   ├── <a href="docs/05-environment-promotion">05-environment-promotion/</a>

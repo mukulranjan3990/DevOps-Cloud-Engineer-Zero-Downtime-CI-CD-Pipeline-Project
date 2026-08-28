@@ -329,10 +329,10 @@ compliance-gate orchestration diagram. :contentReference[oaicite:4]{index=4}
 <pre>
 DOC5A-CICD-Pipeline-NovaPay/
 │
-├── <a href="docs">docs/</a>
-│   ├── <a href="docs/research-notes.md">research-notes.md</a>
-│   ├── <a href="docs/RBI-IT-RISK-SECTION-4-7.md">RBI-IT-RISK-SECTION-4-7.md</a>
-│   ├── <a href="docs/PCI-DSS-REQUIREMENTS.md">PCI-DSS-REQUIREMENTS.md</a>
+├── <a href="../../docs/">docs/</a>
+│   ├── <a href="../research-notes.md">research-notes.md</a>
+│   ├── <a href="../RBI-IT-RISK-SECTION-4-7.md">RBI-IT-RISK-SECTION-4-7.md</a>
+│   ├── <a href="../PCI-DSS-REQUIREMENTS.md">PCI-DSS-REQUIREMENTS.md</a>
 │   
 │
 └── <a href=".github">.github/</a>
