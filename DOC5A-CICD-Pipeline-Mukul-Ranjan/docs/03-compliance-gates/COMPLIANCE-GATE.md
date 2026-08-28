@@ -323,22 +323,26 @@ compliance-gate orchestration diagram. :contentReference[oaicite:4]{index=4}
 
 ---
 
-## This A4 folder will now look like this
 
+### NovaPay Documentation & Pipeline Structure
 
+<pre>
 DOC5A-CICD-Pipeline-NovaPay/
 │
-├── docs/
-│   ├── [research-notes.md](./research-notes.md)
-│   ├── [RBI-IT-RISK-SECTION-4-7.md](.RBI-IT-RISK-SECTION-4-7.md)
-│   ├── [PCI-DSS-REQUIREMENTS.md](.PCI-DSS-REQUIREMENTS.md)
-│   └── [COMPLIANCE-GATE.md](.COMPLIANCE-GATE.md)
+├── <a href="docs">docs/</a>
+│   ├── <a href="docs/research-notes.md">research-notes.md</a>
+│   ├── <a href="docs/RBI-IT-RISK-SECTION-4-7.md">RBI-IT-RISK-SECTION-4-7.md</a>
+│   ├── <a href="docs/PCI-DSS-REQUIREMENTS.md">PCI-DSS-REQUIREMENTS.md</a>
+│   
 │
-├── .github/
-│   └── workflows/
-│
-└── ...
+└── <a href=".github">.github/</a>
+    └── <a href=".github/workflows">workflows/</a>
+</pre>
 
+---
+---
+
+```
 RBI-RULES.md
     ↓
 "What RBI rules do we need to follow?"
@@ -352,8 +356,8 @@ COMPLIANCE-GATE.md
 "How do we turn those rules into automatic
 checks inside our CI/CD pipeline?"
 
-
-
+```
+---
 
 ### Compliance Gate Table Information.
 

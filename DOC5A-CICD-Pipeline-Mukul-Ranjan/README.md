@@ -97,6 +97,8 @@ Project1A-DevOps&CloudEngineer-YourName
 │
 └── evidence/
     └── screenshots/
+
+
 ```
 
 
@@ -112,14 +114,24 @@ Project1A-DevOps&CloudEngineer-YourName/
 │
 ├── <a href="docs">docs/</a>
 │   ├── <a href="docs/research-notes.md">research-notes.md</a>
+│   ├── <a href="docs/RBI-IT-RISK-SECTION-4-7.md">RBI-IT-RISK-SECTION-4-7.md</a>
+│   ├── <a href="docs/PCI-DSS-REQUIREMENTS.md">PCI-DSS-REQUIREMENTS.md</a>
+|   |
 │   │
 │   ├── <a href="docs/01-pipeline-architecture">01-pipeline-architecture/</a>
 │   │   ├── <a href="docs/01-pipeline-architecture/architecture.md">architecture.md</a>
+|   |   | 
 │   │   ├── <a href="docs/01-pipeline-architecture/diagrams">diagrams/</a>
+|   |   |   ├── <a href="novapay-pipeline-architecture-v1.drawio">novapay-pipeline-architecture-v1.drawio</a>
+|   |   |   └── <a href="novapay-pipeline-architecture-v1.png">novapay-pipeline-architecture-v1.png</a>
+|   |   |    
 │   │   └── <a href="docs/01-pipeline-architecture/stage-details">stage-details/</a>
+|   |       └── <a href="pipeline-stage-specifications.md">pipeline-stage-specifications.md</a>
 │   │
 │   ├── <a href="docs/02-deployment-strategies">02-deployment-strategies/</a>
 │   ├── <a href="docs/03-compliance-gates">03-compliance-gates/</a>
+│   |   └── <a href="docs/COMPLIANCE-GATE.md">COMPLIANCE-GATE.md</a>
+|   |
 │   ├── <a href="docs/04-database-migration">04-database-migration/</a>
 │   ├── <a href="docs/05-environment-promotion">05-environment-promotion/</a>
 │   ├── <a href="docs/06-rollback-specification">06-rollback-specification/</a>

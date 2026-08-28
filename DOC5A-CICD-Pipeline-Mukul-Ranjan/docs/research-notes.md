@@ -63,7 +63,7 @@ maintaining regulatory controls.
 
 ---
 
-# [NovaPay Compliance Gates](COMPLIANCE-GATE.md)
+# [NovaPay Compliance Gates](03-compliance-gates/COMPLIANCE-GATE.md)
 
 
 ---
