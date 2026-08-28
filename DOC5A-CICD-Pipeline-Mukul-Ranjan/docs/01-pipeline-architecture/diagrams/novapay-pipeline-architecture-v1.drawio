@@ -1,0 +1,133 @@
+<mxfile host="app.diagrams.net" modified="2026-08-28T22:59:00+05:30" agent="ChatGPT" version="24.7.17">
+  <diagram id="novapay-pipeline-v1" name="NovaPay CI/CD Pipeline v1">
+    <mxGraphModel dx="1600" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="title" value="NovaPay Zero-Downtime CI/CD Pipeline — v1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=24;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="450" y="20" width="700" height="50" as="geometry"/>
+        </mxCell>
+
+        <!-- Stage 1 -->
+        <mxCell id="s1" value="&lt;b&gt;1. SOURCE &amp;amp; TRIGGER&lt;/b&gt;&lt;br&gt;Tool: GitHub + GitHub Actions&lt;br&gt;&lt;br&gt;&lt;b&gt;Input:&lt;/b&gt; Commit / Pull Request&lt;br&gt;&lt;b&gt;Output:&lt;/b&gt; Validated commit + pipeline run&lt;br&gt;&lt;b&gt;Gate:&lt;/b&gt; Review + signed commit + protected branch&lt;br&gt;&lt;b&gt;Failure:&lt;/b&gt; Block PR / fix approval&lt;br&gt;&lt;b&gt;Time:&lt;/b&gt; 1–3 min" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="40" y="110" width="300" height="190" as="geometry"/>
+        </mxCell>
+
+        <!-- Stage 2 -->
+        <mxCell id="s2" value="&lt;b&gt;2. BUILD &amp;amp; UNIT TEST&lt;/b&gt;&lt;br&gt;Tool: Maven + JUnit + Docker&lt;br&gt;&lt;br&gt;&lt;b&gt;Input:&lt;/b&gt; Java source + build files&lt;br&gt;&lt;b&gt;Output:&lt;/b&gt; JAR + versioned container image + reports&lt;br&gt;&lt;b&gt;Gate:&lt;/b&gt; Build pass; ≥80% line; ≥70% branch coverage&lt;br&gt;&lt;b&gt;Failure:&lt;/b&gt; Stop and rebuild after fix&lt;br&gt;&lt;b&gt;Time:&lt;/b&gt; 5–15 min" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=13;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="400" y="110" width="300" height="190" as="geometry"/>
+        </mxCell>
+
+        <!-- Stage 3 -->
+        <mxCell id="s3" value="&lt;b&gt;3. SAST / STATIC ANALYSIS&lt;/b&gt;&lt;br&gt;Tool: SonarQube&lt;br&gt;&lt;br&gt;&lt;b&gt;Input:&lt;/b&gt; Source + coverage report&lt;br&gt;&lt;b&gt;Output:&lt;/b&gt; Bugs / vulnerabilities / code-quality report&lt;br&gt;&lt;b&gt;Gate:&lt;/b&gt; 0 critical; high threshold; new-code quality gate pass&lt;br&gt;&lt;b&gt;Failure:&lt;/b&gt; Block promotion; fix code&lt;br&gt;&lt;b&gt;Time:&lt;/b&gt; 2–5 min" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="760" y="110" width="300" height="190" as="geometry"/>
+        </mxCell>
+
+        <!-- Stage 4 -->
+        <mxCell id="s4" value="&lt;b&gt;4. DEPENDENCY &amp;amp; CONTAINER SCAN&lt;/b&gt;&lt;br&gt;Tool: Trivy + SBOM&lt;br&gt;&lt;br&gt;&lt;b&gt;Input:&lt;/b&gt; Container image + dependencies&lt;br&gt;&lt;b&gt;Output:&lt;/b&gt; CVE report + SBOM + license findings&lt;br&gt;&lt;b&gt;Gate:&lt;/b&gt; Critical = 0; high-severity policy satisfied&lt;br&gt;&lt;b&gt;Failure:&lt;/b&gt; Block image; remediate and rescan&lt;br&gt;&lt;b&gt;Time:&lt;/b&gt; 3–8 min" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="1120" y="110" width="300" height="190" as="geometry"/>
+        </mxCell>
+
+        <!-- Parallel label -->
+        <mxCell id="parallel" value="PARALLEL SECURITY / QUALITY CHECKS" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+          <mxGeometry x="755" y="320" width="670" height="35" as="geometry"/>
+        </mxCell>
+
+        <!-- Stage 5 -->
+        <mxCell id="s5" value="&lt;b&gt;5. INTEGRATION &amp;amp; CONTRACT TESTING&lt;/b&gt;&lt;br&gt;Tool: JUnit + Testcontainers + Pact&lt;br&gt;&lt;br&gt;&lt;b&gt;Input:&lt;/b&gt; Image + APIs + DB + service contracts&lt;br&gt;&lt;b&gt;Output:&lt;/b&gt; Integration / contract test results&lt;br&gt;&lt;b&gt;Gate:&lt;/b&gt; Integration pass + backward-compatible contracts&lt;br&gt;&lt;b&gt;Failure:&lt;/b&gt; Stop; fix service/API and rerun&lt;br&gt;&lt;b&gt;Time:&lt;/b&gt; 10–20 min" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="220" y="410" width="330" height="205" as="geometry"/>
+        </mxCell>
+
+        <!-- Stage 6 -->
+        <mxCell id="s6" value="&lt;b&gt;6. DAST&lt;/b&gt;&lt;br&gt;Tool: OWASP ZAP&lt;br&gt;&lt;br&gt;&lt;b&gt;Input:&lt;/b&gt; Running staging app + OpenAPI + test auth&lt;br&gt;&lt;b&gt;Output:&lt;/b&gt; Dynamic security scan report&lt;br&gt;&lt;b&gt;Gate:&lt;/b&gt; Blocking critical/high findings = 0&lt;br&gt;&lt;b&gt;Failure:&lt;/b&gt; Stop promotion; remediate and rescan&lt;br&gt;&lt;b&gt;Time:&lt;/b&gt; 5–15 min" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="590" y="410" width="330" height="205" as="geometry"/>
+        </mxCell>
+
+        <!-- Stage 7 -->
+        <mxCell id="s7" value="&lt;b&gt;7. POLICY &amp;amp; COMPLIANCE GATES&lt;/b&gt;&lt;br&gt;Tool: OPA / Kyverno + Cosign + GitHub controls&lt;br&gt;&lt;br&gt;&lt;b&gt;Input:&lt;/b&gt; Reports + manifests + SBOM + signed image + identity&lt;br&gt;&lt;b&gt;Output:&lt;/b&gt; Compliance decision + evidence&lt;br&gt;&lt;b&gt;Gate:&lt;/b&gt; RBI / PCI-DSS / SoD / signing / audit controls pass&lt;br&gt;&lt;b&gt;Failure:&lt;/b&gt; Hard block + remediation / authorized exception&lt;br&gt;&lt;b&gt;Time:&lt;/b&gt; 2–5 min" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=13;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="960" y="410" width="390" height="205" as="geometry"/>
+        </mxCell>
+
+        <!-- Approval decision -->
+        <mxCell id="gate" value="&lt;b&gt;ALL QUALITY &amp;amp; COMPLIANCE GATES PASS?&lt;/b&gt;" style="rhombus;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=14;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="570" y="680" width="360" height="110" as="geometry"/>
+        </mxCell>
+
+        <!-- Fail path -->
+        <mxCell id="block" value="BLOCK / REMEDIATE&lt;br&gt;Create evidence → Fix → New commit → Re-run affected stages" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="100" y="700" width="350" height="90" as="geometry"/>
+        </mxCell>
+
+        <!-- Stage 8 -->
+        <mxCell id="s8" value="&lt;b&gt;8. DEPLOY &amp;amp; VERIFY&lt;/b&gt;&lt;br&gt;Tool: Argo CD + Kubernetes + Istio / Argo Rollouts&lt;br&gt;&lt;br&gt;&lt;b&gt;Input:&lt;/b&gt; Approved image + Helm/manifests&lt;br&gt;&lt;b&gt;Output:&lt;/b&gt; Running release + deployment evidence&lt;br&gt;&lt;b&gt;Gate:&lt;/b&gt; Health + smoke + synthetic payment + SLO metrics&lt;br&gt;&lt;b&gt;Failure:&lt;/b&gt; Automatic rollback to last known-good version&lt;br&gt;&lt;b&gt;Time:&lt;/b&gt; 10–30 min active rollout" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;spacing=8;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="650" width="430" height="220" as="geometry"/>
+        </mxCell>
+
+        <!-- Rollback -->
+        <mxCell id="rollback" value="&lt;b&gt;AUTOMATIC ROLLBACK&lt;/b&gt;&lt;br&gt;Prometheus / Alertmanager signals&lt;br&gt;5xx / latency / health / payment success thresholds&lt;br&gt;Traffic → previous version&lt;br&gt;Verify recovery + create incident evidence" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="1010" y="910" width="430" height="145" as="geometry"/>
+        </mxCell>
+
+        <!-- Success -->
+        <mxCell id="success" value="&lt;b&gt;PRODUCTION STABLE&lt;/b&gt;&lt;br&gt;100% traffic on approved release&lt;br&gt;Continue monitoring / bake period&lt;br&gt;Audit evidence retained" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="500" y="900" width="390" height="130" as="geometry"/>
+        </mxCell>
+
+        <!-- Deployment strategy -->
+        <mxCell id="strategy" value="&lt;b&gt;Progressive Delivery&lt;/b&gt;&lt;br&gt;Blue-Green or Canary&lt;br&gt;1–2% → 5–10% → 25–50% → 100%&lt;br&gt;Promote only when verification gates pass" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="50" y="880" width="390" height="150" as="geometry"/>
+        </mxCell>
+
+        <!-- Edges -->
+        <mxCell id="e12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="s1" target="s2">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="s2" target="s3">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="s2" target="s4">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e35" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="s3" target="s5">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e45" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="s4" target="s5">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e56" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="s5" target="s6">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e67" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="s6" target="s7">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e7g" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="s7" target="gate">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="eg8" value="YES" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;fontStyle=1;" edge="1" parent="1" source="gate" target="s8">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="egf" value="NO" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;dashed=1;fontStyle=1;" edge="1" parent="1" source="gate" target="block">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e8s" value="HEALTHY" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;fontStyle=1;" edge="1" parent="1" source="s8" target="success">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e8r" value="UNHEALTHY / THRESHOLD BREACH" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;dashed=1;fontStyle=1;" edge="1" parent="1" source="s8" target="rollback">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="er" value="RESTORE LAST KNOWN GOOD" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="rollback" target="success">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="es" value="PROGRESSIVE TRAFFIC" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;" edge="1" parent="1" source="strategy" target="s8">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- Timing note -->
+        <mxCell id="timing" value="&lt;b&gt;Pipeline timing target&lt;/b&gt;&lt;br&gt;Estimated active execution: ~38–101 min depending on parallelisation and test duration.&lt;br&gt;Target: commit → production &lt; 2 hours.&lt;br&gt;Post-release bake/monitoring is tracked separately from synchronous promotion time." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="50" y="1060" width="1390" height="100" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
