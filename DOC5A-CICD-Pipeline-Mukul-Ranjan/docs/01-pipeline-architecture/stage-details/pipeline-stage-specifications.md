@@ -263,6 +263,14 @@ No deployment job starts after a Stage 1 failure.
 
 **2 minutes**
 
+## Configuration
+```yaml
+required_reviewers: 2
+require_signed_commits: true
+allow_force_push: false
+allow_direct_main_push: false
+```
+
 ---
 
 # 5. Stage 2 — Build & Compilation
@@ -387,6 +395,15 @@ Build failure
 
 **12 minutes**
 
+## Configuration
+```text
+line_coverage_min = 80%
+branch_coverage_min = 70%
+unit_tests_required = true
+production_tag = SemVer + Git SHA
+latest_tag_in_production = prohibited
+```
+
 ---
 
 # 6. Stage 3 — Static Analysis & SAST
@@ -503,6 +520,14 @@ SAST re-run
 
 **4 minutes**
 
+## Configuration
+```text
+quality_gate = NovaPay-Production
+critical_vulnerabilities = 0
+high_vulnerability_limit = 2
+new_code_technical_debt_limit = 5%
+```
+
 ---
 
 # 7. Stage 4 — Dependency & Container Scanning
@@ -614,6 +639,17 @@ Rescan
 ## Estimated duration
 
 **6 minutes**
+
+## Configuration
+```text
+critical_cve_limit = 0
+high_cve_block_threshold = CVSS > 8.0
+sbom_required = true
+sbom_format = CycloneDX or SPDX
+unapproved_license = BLOCK
+trusted_base_image_required = true
+```
+
 
 ---
 
@@ -728,6 +764,16 @@ Integration + contract re-test
 
 **18 minutes**
 
+## Configuration
+```text
+integration_tests_required = true
+contract_tests_required = true
+backward_compatibility_required = true
+critical_test_failures_allowed = 0
+ephemeral_environment = true
+```
+
+
 ---
 
 # 9. Stage 6 — Dynamic Analysis & DAST
@@ -825,6 +871,16 @@ DAST re-scan
 ## Estimated duration
 
 **10 minutes**
+
+## Configuration
+```text
+passive_scan = enabled
+active_scan = enabled
+authenticated_scan = enabled
+critical_block = 0
+high_block = 0
+```
+
 
 ---
 
@@ -1047,6 +1103,18 @@ Exceptions require documented business justification, risk acceptance, named app
 ## Estimated duration
 
 **5 minutes**
+
+## Configuration
+```text
+signed_image_required = true
+sbom_required = true
+critical_vulnerability_limit = 0
+production_approval_required = true
+segregation_of_duties_required = true
+plaintext_secrets_allowed = false
+audit_evidence_required = true
+```
+
 
 ---
 
