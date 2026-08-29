@@ -176,7 +176,7 @@ The CI/CD pipeline should provide:
 - Deployment records
 
 ## Example Flow
-
+```text
 Developer
     |
     v
@@ -207,7 +207,7 @@ Rollback if deployment fails
 
 Every production change should be controlled, traceable and
 recoverable.
-
+```
 
 ---
 
@@ -236,7 +236,7 @@ Use:
 - Production approval controls
 
 ## Example
-
+```text
 Developer
     |
     v
@@ -253,6 +253,7 @@ Authorized Production Approval
     |
     v
 Deployment
+```
 
 ## Goal
 
@@ -280,7 +281,7 @@ Include security scanning such as:
 - Container scanning
 
 ## Example
-
+```text
 Source Code
     |
     v
@@ -304,6 +305,8 @@ If a serious vulnerability is found:
       |
       v
 Deployment Blocked
+```
+
 
 ## Goal
 
@@ -330,7 +333,7 @@ The CI/CD pipeline should verify:
 - Required encryption controls
 
 ## Example
-
+```text
 Deployment
     |
     v
@@ -340,6 +343,7 @@ Encryption Check
     |
     +---- FAIL ---> Block Deployment
 
+```
 ## Goal
 
 Prevent insecure communication and improperly protected
@@ -371,7 +375,7 @@ We should be able to answer:
 Maintain pipeline audit logs and an immutable change record.
 
 ## Example
-
+```text
 Code Change
     |
     v
@@ -383,6 +387,7 @@ Pipeline
     +--> Approval
     +--> Deployment information
     +--> Artifact version
+```
 
 ## Goal
 
@@ -408,7 +413,7 @@ Provide:
 - Disaster recovery design
 
 ## Example
-
+```text
 Deployment
     |
     v
@@ -426,6 +431,8 @@ Health Check
               |
               v
         Incident Process
+```
+
 
 ## Goal
 
@@ -452,7 +459,7 @@ Use:
 - Vendor security assessment
 
 ## Example
-
+```text
 Application
     |
     v
@@ -465,6 +472,8 @@ Dependencies
     +--> SBOM
     |
     +--> Vendor Assessment
+```
+
 
 ## Goal
 

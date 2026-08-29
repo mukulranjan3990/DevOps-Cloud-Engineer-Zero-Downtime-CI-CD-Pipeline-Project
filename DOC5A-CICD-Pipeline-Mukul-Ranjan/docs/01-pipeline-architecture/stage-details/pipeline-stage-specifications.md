@@ -396,12 +396,12 @@ Build failure
 **12 minutes**
 
 ## Configuration
-```text
-line_coverage_min = 80%
-branch_coverage_min = 70%
-unit_tests_required = true
-production_tag = SemVer + Git SHA
-latest_tag_in_production = prohibited
+```yaml
+line_coverage_min: 80%
+branch_coverage_min: 70%
+unit_tests_required: true
+production_tag: SemVer + Git SHA
+latest_tag_in_production: prohibited
 ```
 
 ---
@@ -873,12 +873,14 @@ DAST re-scan
 **10 minutes**
 
 ## Configuration
-```text
+```yaml
+
 passive_scan = enabled
 active_scan = enabled
 authenticated_scan = enabled
 critical_block = 0
 high_block = 0
+
 ```
 
 
