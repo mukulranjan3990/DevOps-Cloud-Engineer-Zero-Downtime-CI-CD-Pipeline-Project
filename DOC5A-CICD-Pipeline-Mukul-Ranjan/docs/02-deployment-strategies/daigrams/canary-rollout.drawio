@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net"><diagram name="Canary Rollout"><mxGraphModel><root>
+<mxCell id="0"/><mxCell id="1" parent="0"/>
+<mxCell id="u" value="Users / Customers" style="rounded=1;whiteSpace=wrap;html=1;fontSize=18" vertex="1" parent="1"><mxGeometry x="600" y="30" width="300" height="60" as="geometry"/></mxCell>
+<mxCell id="i" value="Istio Ingress Gateway" style="rounded=1;whiteSpace=wrap;html=1;fontSize=18" vertex="1" parent="1"><mxGeometry x="600" y="130" width="300" height="60" as="geometry"/></mxCell>
+<mxCell id="v" value="Istio VirtualService&#xa;Progressive Traffic Routing" style="rounded=1;whiteSpace=wrap;html=1;fontSize=18" vertex="1" parent="1"><mxGeometry x="550" y="230" width="400" height="70" as="geometry"/></mxCell>
+<mxCell id="s" value="STABLE vN&#xa;Kubernetes Deployment&#xa;Majority Traffic" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=17" vertex="1" parent="1"><mxGeometry x="260" y="370" width="340" height="120" as="geometry"/></mxCell>
+<mxCell id="c" value="CANARY vN+1&#xa;Kubernetes Deployment&#xa;Progressive Traffic" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=17" vertex="1" parent="1"><mxGeometry x="900" y="370" width="340" height="120" as="geometry"/></mxCell>
+<mxCell id="r" value="Redis Cluster&#xa;Distributed Sessions" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16" vertex="1" parent="1"><mxGeometry x="500" y="550" width="300" height="80" as="geometry"/></mxCell>
+<mxCell id="d" value="PostgreSQL&#xa;Shared Database" style="shape=cylinder;whiteSpace=wrap;html=1;fontSize=16" vertex="1" parent="1"><mxGeometry x="900" y="550" width="280" height="80" as="geometry"/></mxCell>
+<mxCell id="o" value="Observability&#xa;Prometheus + Grafana + Alertmanager" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16" vertex="1" parent="1"><mxGeometry x="420" y="700" width="500" height="80" as="geometry"/></mxCell>
+<mxCell id="p1" value="PHASE 1&#xa;1–2% • 15 min&#xa;Error &lt;0.1% • p99 &lt;200ms" style="rounded=1;whiteSpace=wrap;html=1;fontSize=15" vertex="1" parent="1"><mxGeometry x="1300" y="100" width="300" height="100" as="geometry"/></mxCell>
+<mxCell id="p2" value="PHASE 2&#xa;5–10% • 30 min&#xa;Error &lt;0.05% • No critical alerts" style="rounded=1;whiteSpace=wrap;html=1;fontSize=15" vertex="1" parent="1"><mxGeometry x="1300" y="220" width="300" height="100" as="geometry"/></mxCell>
+<mxCell id="p3" value="PHASE 3&#xa;25–50% • 60 min&#xa;All SLOs met • No degradation" style="rounded=1;whiteSpace=wrap;html=1;fontSize=15" vertex="1" parent="1"><mxGeometry x="1300" y="340" width="300" height="100" as="geometry"/></mxCell>
+<mxCell id="p4" value="PHASE 4&#xa;100% • 24 hr bake&#xa;Complete SLO compliance" style="rounded=1;whiteSpace=wrap;html=1;fontSize=15" vertex="1" parent="1"><mxGeometry x="1300" y="460" width="300" height="100" as="geometry"/></mxCell>
+<mxCell id="st" value="Statistical Gates&#xa;Welch’s t-test → latency&#xa;Chi-squared → error rates" style="rounded=1;whiteSpace=wrap;html=1;fontSize=15" vertex="1" parent="1"><mxGeometry x="1200" y="620" width="400" height="100" as="geometry"/></mxCell>
+<mxCell id="rb" value="AUTO-ROLLBACK&#xa;Threshold / health failure&#xa;Return traffic to Stable" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=15" vertex="1" parent="1"><mxGeometry x="1200" y="760" width="400" height="90" as="geometry"/></mxCell>
+<mxCell id="e1" edge="1" parent="1" source="u" target="i"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="e2" edge="1" parent="1" source="i" target="v"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="e3" edge="1" parent="1" source="v" target="s"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="e4" edge="1" parent="1" source="v" target="c"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="e5" edge="1" parent="1" source="s" target="r"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="e6" edge="1" parent="1" source="c" target="r"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="e7" edge="1" parent="1" source="s" target="d"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="e8" edge="1" parent="1" source="c" target="d"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="e9" edge="1" parent="1" source="v" target="o"><mxGeometry relative="1" as="geometry"/></mxCell>
+<mxCell id="e10" edge="1" parent="1" source="st" target="rb"><mxGeometry relative="1" as="geometry"/></mxCell>
+</root></mxGraphModel></diagram></mxfile>

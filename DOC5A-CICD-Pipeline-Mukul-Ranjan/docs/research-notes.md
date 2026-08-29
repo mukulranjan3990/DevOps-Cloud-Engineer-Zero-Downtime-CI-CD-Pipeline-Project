@@ -85,7 +85,7 @@ Build a CI/CD platform that allows NovaPay to:
 5. Roll back automatically when required
 6. Maintain complete deployment evidence
 
-### some important questioni of the day 1 
+## Some important questioni of the day 1 
 
 1. Why does NovaPay need a special CI/CD pipeline instead of a normal DevOps pipeline?
    
@@ -134,14 +134,14 @@ Rollback if unhealthy
 
 
 ## next steps: 
-
+```text
 A2 = HOW the CI/CD pipeline works
 A3 = HOW to deploy without downtime
 A4 = HOW to enforce compliance
 A5 = HOW to measure reliability/performance
 A6 = HOW to operate and respond to incidents
 A7 = WHERE to learn these technologies
-
+```
 
 ###    A2 - CI/CD Pipeline Fundamentals                   
 
