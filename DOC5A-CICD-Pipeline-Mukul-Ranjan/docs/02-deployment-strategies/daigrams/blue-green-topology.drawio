@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net">
+  <diagram name="Blue-Green Topology">
+    <mxGraphModel dx="1200" dy="800" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1600" pageHeight="1000">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="internet" value="Internet / Mobile / Web" style="rounded=1;whiteSpace=wrap;html=1;fontSize=18;" vertex="1" parent="1"><mxGeometry x="620" y="40" width="300" height="60" as="geometry"/></mxCell>
+        <mxCell id="lb" value="Load Balancer / Ingress" style="rounded=1;whiteSpace=wrap;html=1;fontSize=18;" vertex="1" parent="1"><mxGeometry x="620" y="140" width="300" height="60" as="geometry"/></mxCell>
+        <mxCell id="istio" value="Istio Ingress Gateway&#xa;+ VirtualService" style="rounded=1;whiteSpace=wrap;html=1;fontSize=18;" vertex="1" parent="1"><mxGeometry x="590" y="240" width="360" height="80" as="geometry"/></mxCell>
+        <mxCell id="blue" value="BLUE — Current vN&#xa;Kubernetes Service&#xa;Pods" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=18;" vertex="1" parent="1"><mxGeometry x="260" y="390" width="330" height="130" as="geometry"/></mxCell>
+        <mxCell id="green" value="GREEN — New vN+1&#xa;Kubernetes Service&#xa;Pods" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=18;" vertex="1" parent="1"><mxGeometry x="950" y="390" width="330" height="130" as="geometry"/></mxCell>
+        <mxCell id="pg" value="PostgreSQL&#xa;Shared Database" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1"><mxGeometry x="180" y="650" width="270" height="90" as="geometry"/></mxCell>
+        <mxCell id="redis" value="Redis Cluster&#xa;Distributed Sessions" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1"><mxGeometry x="565" y="650" width="270" height="90" as="geometry"/></mxCell>
+        <mxCell id="rabbit" value="RabbitMQ&#xa;Messaging" style="rounded=1;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1"><mxGeometry x="950" y="650" width="270" height="90" as="geometry"/></mxCell>
+        <mxCell id="e1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=block;" edge="1" parent="1" source="internet" target="lb"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=block;" edge="1" parent="1" source="lb" target="istio"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e3" value="Traffic routing" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=block;fontSize=14;" edge="1" parent="1" source="istio" target="blue"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e4" value="Traffic routing" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=block;fontSize=14;" edge="1" parent="1" source="istio" target="green"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=block;" edge="1" parent="1" source="blue" target="pg"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=block;" edge="1" parent="1" source="blue" target="redis"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e7" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=block;" edge="1" parent="1" source="blue" target="rabbit"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=block;" edge="1" parent="1" source="green" target="pg"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=block;" edge="1" parent="1" source="green" target="redis"><mxGeometry relative="1" as="geometry"/></mxCell>
+        <mxCell id="e10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=block;" edge="1" parent="1" source="green" target="rabbit"><mxGeometry relative="1" as="geometry"/></mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
