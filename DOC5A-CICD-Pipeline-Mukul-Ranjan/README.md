@@ -130,7 +130,7 @@ Project1A-DevOps&CloudEngineer-YourName/
 │   │
 │   ├── <a href="docs/02-deployment-strategies">02-deployment-strategies/</a>
 │   ├── <a href="docs/03-compliance-gates">03-compliance-gates/</a>
-│   |   └── <a href="docs/03-compliance-gates/COMPLIANCE-GATE.md">COMPLIANCE-GATE.md</a>
+│   |   └── <a href="docs/03-compliance-gates/COMPLIANCE-NOTES.md">COMPLIANCE-NOTES.md</a>
 |   |
 │   ├── <a href="docs/04-database-migration">04-database-migration/</a>
 │   ├── <a href="docs/05-environment-promotion">05-environment-promotion/</a>
