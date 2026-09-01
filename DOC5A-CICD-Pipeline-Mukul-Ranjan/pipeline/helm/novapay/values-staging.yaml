@@ -1,0 +1,49 @@
+# NovaPay Helm STAGING override
+# Data: anonymised production-like data
+# Access: development team + QA
+# Trigger: automatic after DEV gates pass
+
+environment: staging
+
+replicaCount: 2
+
+image:
+  # Promoted immutable artifact; do not rebuild for staging.
+  tag: ""
+  digest: ""
+
+resources:
+  requests:
+    cpu: "250m"
+    memory: "512Mi"
+  limits:
+    cpu: "1000m"
+    memory: "1Gi"
+
+featureFlags:
+  newPaymentFlow: true
+  rolloutPercentage: 100
+
+database:
+  host: "novapay-postgresql-staging"
+  port: 5432
+  name: "novapay_staging"
+
+logging:
+  level: INFO
+
+monitoring:
+  enabled: true
+
+deployment:
+  strategy: RollingUpdate
+  maxUnavailable: 0
+  maxSurge: 1
+
+secrets:
+  provider: vault
+  path: "secret/data/novapay/staging"
+
+dataPolicy:
+  profile: anonymised-production-like
+  productionDataAllowed: false

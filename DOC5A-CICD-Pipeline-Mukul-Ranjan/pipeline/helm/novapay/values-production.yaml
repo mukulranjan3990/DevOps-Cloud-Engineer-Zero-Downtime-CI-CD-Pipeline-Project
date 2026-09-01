@@ -1,0 +1,79 @@
+# NovaPay Helm PRODUCTION override
+# Data: real production data
+# Access: SRE + Release Manager only
+# Trigger: dual approval — Release Manager + SRE Lead
+#
+# IMPORTANT:
+# No plaintext secrets are stored here.
+# The same immutable image digest promoted from PRE-PROD must be used.
+
+environment: production
+
+replicaCount: 6
+
+image:
+  # Set by the promotion pipeline to the already-approved immutable digest.
+  tag: ""
+  digest: ""
+
+resources:
+  requests:
+    cpu: "500m"
+    memory: "1Gi"
+  limits:
+    cpu: "2000m"
+    memory: "4Gi"
+
+featureFlags:
+  # New features start disabled in production.
+  newPaymentFlow: false
+  rolloutPercentage: 0
+
+database:
+  host: "novapay-postgresql-production"
+  port: 5432
+  name: "novapay"
+
+logging:
+  level: INFO
+
+monitoring:
+  enabled: true
+
+deployment:
+  strategy: RollingUpdate
+  maxUnavailable: 0
+  maxSurge: 1
+
+secrets:
+  provider: vault
+  path: "secret/data/novapay/production"
+
+dataPolicy:
+  profile: real-production
+  productionDataAllowed: true
+
+productionControls:
+  dualApprovalRequired: true
+  releaseManagerApprovalRequired: true
+  sreLeadApprovalRequired: true
+  deploymentWindowRequired: true
+  blackoutPeriodCheck: true
+  peakHoursCheck: true
+  onCallRequired: true
+  runbookApprovalRequired: true
+  complianceGatesRequired: true
+
+canary:
+  enabled: true
+  initialPercentage: 1
+  steps:
+    - 1
+    - 10
+    - 50
+    - 100
+
+driftDetection:
+  managedBy: argocd
+  checkInterval: 3m
+  unauthorizedDriftAction: alert-and-investigate

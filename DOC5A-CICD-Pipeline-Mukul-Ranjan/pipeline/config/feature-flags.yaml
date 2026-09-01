@@ -1,0 +1,78 @@
+# NovaPay Feature Flags
+# Day 7 — Environment Promotion Workflow
+# Assessment requirement: environment-aware feature flags.
+# New features are deployed to all environments but remain OFF in production
+# until approved. Production rollout: 1% → 10% → 50% → 100%.
+#
+# IMPORTANT:
+# This file contains configuration only. Secrets must never be stored here.
+
+featureFlags:
+  newPaymentFlow:
+    description: "Controls the new payment processing flow."
+    type: percentage
+    defaultPercentage: 0
+
+    environments:
+      dev:
+        enabled: true
+        percentage: 100
+
+      staging:
+        enabled: true
+        percentage: 100
+
+      preprod:
+        enabled: true
+        percentage: 100
+
+      production:
+        enabled: false
+        percentage: 0
+        rollout:
+          enabled: true
+          steps:
+            - 1
+            - 10
+            - 50
+            - 100
+
+    safety:
+      failClosed: true
+      requireApprovalForProduction: true
+      rollbackAction: "set production percentage to 0"
+
+    monitoring:
+      errorRate: true
+      p99Latency: true
+      paymentSuccessRate: true
+      applicationHealth: true
+      databaseHealth: true
+
+    promotionRules:
+      devToStaging: "automated after required DEV gates pass"
+      stagingToPreprod: "Tech Lead approval after required STAGING gates pass"
+      preprodToProduction: "Release Manager + SRE Lead approval"
+
+  # Template for future flags.
+  # Copy this structure rather than introducing environment-specific code.
+  exampleFeature:
+    description: "Template feature flag."
+    type: percentage
+    defaultPercentage: 0
+    environments:
+      dev:
+        enabled: true
+        percentage: 100
+      staging:
+        enabled: true
+        percentage: 100
+      preprod:
+        enabled: true
+        percentage: 100
+      production:
+        enabled: false
+        percentage: 0
+        rollout:
+          enabled: true
+          steps: [1, 10, 50, 100]

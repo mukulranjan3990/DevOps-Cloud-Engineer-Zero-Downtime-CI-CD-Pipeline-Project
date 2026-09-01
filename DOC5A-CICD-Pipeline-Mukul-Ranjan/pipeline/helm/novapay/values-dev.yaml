@@ -1,0 +1,49 @@
+# NovaPay Helm DEV override
+# Data: synthetic/mock only
+# Access: developers
+# Trigger: automatic after PR merge
+
+environment: dev
+
+replicaCount: 1
+
+image:
+  # Same repository/artifact as every environment.
+  tag: ""
+  digest: ""
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "256Mi"
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+
+featureFlags:
+  newPaymentFlow: true
+  rolloutPercentage: 100
+
+database:
+  host: "novapay-postgresql-dev"
+  port: 5432
+  name: "novapay_dev"
+
+logging:
+  level: DEBUG
+
+monitoring:
+  enabled: true
+
+deployment:
+  strategy: RollingUpdate
+  maxUnavailable: 0
+  maxSurge: 1
+
+secrets:
+  provider: vault
+  path: "secret/data/novapay/dev"
+
+dataPolicy:
+  profile: synthetic
+  productionDataAllowed: false

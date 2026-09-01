@@ -1,0 +1,244 @@
+# NovaPay Environment Policy
+# Day 7 — Environment Promotion Workflow
+#
+# Core principle:
+# SAME ARTIFACT + DIFFERENT CONFIGURATION
+#
+# The same immutable container image is promoted through:
+# DEV → STAGING → PRE-PROD → PRODUCTION
+#
+# Environment differences are configuration only, never application-code branches.
+
+apiVersion: novapay.io/v1
+kind: EnvironmentPolicy
+
+spec:
+
+  global:
+    artifactPolicy:
+      buildOnce: true
+      immutableArtifactRequired: true
+      sameArtifactAcrossEnvironments: true
+      environmentSpecificBranchesAllowed: false
+      environmentSpecificCodeAllowed: false
+
+    configurationHierarchy:
+      - base
+      - environmentOverride
+      - serviceOverride
+
+    secrets:
+      provider: vault
+      alternativeProvider: aws-secrets-manager
+      plaintextSecretsAllowed: false
+      gitSecretsAllowed: false
+      helmValueSecretsAllowed: false
+      kubernetesManifestSecretsAllowed: false
+      databasePasswordRotationDays: 90
+      apiKeyRotationDays: 30
+
+    driftDetection:
+      provider: argocd
+      interval: 3m
+      slackNotification: true
+      productionUnauthorizedDriftAction: alert-and-investigate
+
+  environments:
+
+    dev:
+      purpose:
+        - feature-development
+        - unit-testing
+        - developer-validation
+      data:
+        profile: synthetic
+        productionDataAllowed: false
+      access:
+        roles:
+          - Developer
+      deployment:
+        trigger: automatic-after-pr-merge
+      gates:
+        unitTests:
+          required: true
+          passPercentage: 100
+        lineCoverage:
+          minimumPercentage: 80
+        branchCoverage:
+          minimumPercentage: 70
+        sast:
+          critical: 0
+          highMaximum: 2
+
+    staging:
+      purpose:
+        - integration-testing
+        - contract-testing
+        - dast
+        - performance-testing
+      data:
+        profile: anonymised-production-like
+        productionDataAllowed: false
+      access:
+        roles:
+          - Developer
+          - QA
+      deployment:
+        trigger: automatic-after-dev-gates
+      gates:
+        integrationTests:
+          required: true
+          passPercentage: 100
+        contractTests:
+          required: true
+        backwardCompatibility:
+          required: true
+        dast:
+          critical: 0
+          high: 0
+        performance:
+          p99MillisecondsMaximum: 500
+          loadMultiplier: 2
+        dependencyScan:
+          critical: 0
+        sbom:
+          required: true
+        licenceCompliance:
+          required: true
+        prohibitedLicences:
+          - GPL
+          - AGPL
+      approval:
+        requiredRole: Tech Lead
+
+    preprod:
+      purpose:
+        - user-acceptance-testing
+        - compliance-verification
+        - regulatory-validation
+        - production-scale-testing
+        - database-migration-validation
+      data:
+        profile: masked-production-subset
+        productionDataAllowed: false
+      access:
+        roles:
+          - QA
+          - Compliance
+          - DBA
+      deployment:
+        trigger: manual-after-staging-gates
+      gates:
+        uat:
+          required: true
+          approver: Product Owner
+        regulatoryCompliance:
+          required: true
+        rbiVerification:
+          required: true
+        pciDssVerification:
+          required: true
+        databaseMigration:
+          productionScaleValidationRequired: true
+        deploymentRunbook:
+          required: true
+          approver: SRE Lead
+        changeApproval:
+          cabOrPreapprovedCategoryRequired: true
+
+    production:
+      purpose:
+        - live-customer-service
+      data:
+        profile: real-production
+        productionDataAllowed: true
+      access:
+        roles:
+          - SRE
+          - Release Manager
+        developerDirectDeploymentAllowed: false
+      deployment:
+        trigger: dual-approved-production-release
+        strategy:
+          supported:
+            - canary
+            - blue-green
+          featureFlagRollout:
+            - 1
+            - 10
+            - 50
+            - 100
+      approval:
+        required: true
+        roles:
+          - Release Manager
+          - SRE Lead
+        segregationOfDuties: true
+      gates:
+        uatSignoff: required
+        complianceGates: required
+        rbiPciDssVerification: required
+        databaseMigrationValidation: required
+        runbookSreLeadSignoff: required
+        cabOrPreapprovedChange: required
+        deploymentWindow:
+          blackoutPeriod: false
+          peakHours: false
+        onCallEngineer:
+          confirmed: true
+          briefed: true
+
+  dataManagement:
+    nonProductionRules:
+      dev: synthetic-only
+      staging: anonymised-production-like
+      preprod: masked-production-subset
+      production: real-production
+    productionDataCopyToDevAllowed: false
+    productionDataCopyToStagingAllowed: false
+    sensitiveDataMustBeMaskedOrAnonymised: true
+
+  promotion:
+    devToStaging:
+      automatic: true
+      requiredCondition: all-dev-gates-pass
+
+    stagingToPreprod:
+      automatic: false
+      requiredCondition: all-staging-gates-pass
+      approval:
+        role: Tech Lead
+
+    preprodToProduction:
+      automatic: false
+      requiredCondition: all-preprod-gates-pass
+      approvals:
+        - Release Manager
+        - SRE Lead
+      dualApproval: true
+
+  failurePolicy:
+    failedGate:
+      action: block-promotion
+    missingApproval:
+      action: block-promotion
+    complianceFailure:
+      action: block-promotion
+    invalidArtifactDigest:
+      action: block-promotion
+    unauthorizedProductionDrift:
+      action: alert-and-investigate
+
+  audit:
+    promotionRecordRequired: true
+    requiredEvidence:
+      - artifactDigest
+      - gitSha
+      - testResults
+      - securityResults
+      - complianceResults
+      - approvalRecords
+      - configurationVersion
+      - deploymentTimestamp
+      - argocdSyncRecord
+      - driftStatus
