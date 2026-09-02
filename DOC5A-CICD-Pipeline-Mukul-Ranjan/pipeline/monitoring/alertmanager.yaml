@@ -1,0 +1,197 @@
+# NovaPay Digital Bank
+# Day 8 — Alert Routing
+# File: alertmanager.yaml
+#
+# Purpose:
+#   Route Prometheus rollback alerts according to the Day 8 policy:
+#     Category A -> immediate rollback path + SRE notification
+#     Category B -> on-call escalation
+#     Category C -> human decision / incident channel
+#
+# SECURITY:
+#   Replace all placeholder webhook/receiver values with secrets managed
+#   outside Git (Kubernetes Secret, ExternalSecret, Vault, etc.).
+#   Do not commit production credentials to this file.
+
+global:
+  resolve_timeout: 5m
+
+  # SMTP values are intentionally placeholders.
+  smtp_smarthost: "smtp.example.invalid:587"
+  smtp_from: "alertmanager@novapay.example"
+  smtp_require_tls: true
+
+route:
+  receiver: novapay-default
+
+  # Group alerts so a single incident does not create an alert storm.
+  group_by:
+    - alertname
+    - environment
+    - service
+    - rollback_category
+
+  group_wait: 15s
+  group_interval: 1m
+  repeat_interval: 4h
+
+  routes:
+
+    # ==============================================================
+    # CATEGORY A — IMMEDIATE ROLLBACK
+    # Target: <60 seconds
+    # ==============================================================
+    - matchers:
+        - environment="production"
+        - rollback_category="A"
+        - rollback_action="immediate"
+      receiver: novapay-category-a-rollback
+      group_wait: 0s
+      group_interval: 10s
+      repeat_interval: 5m
+      continue: true
+
+    # Always notify the SRE/on-call team for Category A as well.
+    - matchers:
+        - environment="production"
+        - rollback_category="A"
+      receiver: novapay-sre-critical
+      group_wait: 0s
+      group_interval: 10s
+      repeat_interval: 5m
+
+    # ==============================================================
+    # CATEGORY B — ESCALATED
+    # Target: <15 minutes
+    # ==============================================================
+    - matchers:
+        - environment="production"
+        - rollback_category="B"
+        - rollback_action="escalate"
+      receiver: novapay-oncall
+      group_wait: 30s
+      group_interval: 1m
+      repeat_interval: 10m
+      continue: true
+
+    - matchers:
+        - environment="production"
+        - rollback_category="B"
+      receiver: novapay-incident-channel
+      group_wait: 30s
+      group_interval: 1m
+      repeat_interval: 30m
+
+    # ==============================================================
+    # CATEGORY C — MANUAL DECISION
+    # There is deliberately no automatic rollback route here.
+    # ==============================================================
+    - matchers:
+        - environment="production"
+        - rollback_category="C"
+      receiver: novapay-manual-decision
+      group_wait: 1m
+      group_interval: 5m
+      repeat_interval: 1h
+
+inhibit_rules:
+
+  # If a Category A alert exists for the same service/environment,
+  # suppress lower-severity Category B alerts caused by the same incident.
+  - source_matchers:
+      - severity="critical"
+      - rollback_category="A"
+    target_matchers:
+      - severity="warning"
+      - rollback_category="B"
+    equal:
+      - environment
+      - service
+
+  # Suppress duplicate warning notifications when the same alert is already
+  # represented by a critical signal for the same service.
+  - source_matchers:
+      - severity="critical"
+    target_matchers:
+      - severity="warning"
+    equal:
+      - environment
+      - service
+      - alertname
+
+receivers:
+
+  # ----------------------------------------------------------------
+  # Independent rollback mechanism
+  # ----------------------------------------------------------------
+  # This endpoint represents an independently deployed rollback service.
+  # It must NOT depend on the primary CI/CD deployment pipeline.
+  - name: novapay-category-a-rollback
+    webhook_configs:
+      - url: "https://rollback-controller.example.invalid/api/v1/rollback"
+        send_resolved: true
+        http_config:
+          follow_redirects: false
+
+  # ----------------------------------------------------------------
+  # Critical SRE notification
+  # ----------------------------------------------------------------
+  - name: novapay-sre-critical
+    webhook_configs:
+      - url: "https://sre-alerts.example.invalid/webhook/critical"
+        send_resolved: true
+
+  # ----------------------------------------------------------------
+  # Category B on-call notification
+  # ----------------------------------------------------------------
+  - name: novapay-oncall
+    webhook_configs:
+      - url: "https://oncall.example.invalid/webhook/novapay"
+        send_resolved: true
+
+  # ----------------------------------------------------------------
+  # Incident channel
+  # ----------------------------------------------------------------
+  - name: novapay-incident-channel
+    webhook_configs:
+      - url: "https://incident.example.invalid/webhook/novapay"
+        send_resolved: true
+
+  # ----------------------------------------------------------------
+  # Category C human decision
+  # ----------------------------------------------------------------
+  - name: novapay-manual-decision
+    webhook_configs:
+      - url: "https://incident.example.invalid/webhook/manual-review"
+        send_resolved: true
+
+  # ----------------------------------------------------------------
+  # Default / non-production notifications
+  # ----------------------------------------------------------------
+  - name: novapay-default
+    webhook_configs:
+      - url: "https://sre-alerts.example.invalid/webhook/default"
+        send_resolved: true
+
+# Recommended production deployment:
+#
+# Prometheus
+#     |
+#     | evaluates rollback-alerts.yaml
+#     v
+# Alertmanager
+#     |
+#     +--> Category A --> independent rollback-controller
+#     |                     |
+#     |                     +--> route traffic to last-known-good
+#     |                     +--> verify recovery
+#     |                     +--> create rollback evidence
+#     |
+#     +--> Category B --> on-call --> investigate --> rollback if required
+#     |
+#     +--> Category C --> incident channel --> human decision
+#
+# Every rollback should retain:
+# rollback ID, incident ID, trigger, threshold, deployment ID, Git SHA,
+# candidate/stable image digests, routing state, verification results,
+# customer impact and approval/escalation evidence.
