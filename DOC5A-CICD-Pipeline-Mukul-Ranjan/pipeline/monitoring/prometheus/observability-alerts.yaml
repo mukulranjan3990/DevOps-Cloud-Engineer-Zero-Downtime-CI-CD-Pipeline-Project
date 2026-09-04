@@ -1,0 +1,1172 @@
+# NovaPay Prometheus Observability Alerts
+
+**Deliverable:** 8 — Observability & Dashboards  
+**Day:** 10  
+**File:** `prometheus/observability-alerts.yaml`
+
+## 1. Purpose
+
+This Prometheus rule set implements the Day 10 observability alerting layer for NovaPay.
+
+The assessment requires:
+
+- Prometheus/Grafana observability.
+- Severity-based alerting and escalation.
+- SLO/error-budget monitoring.
+- Anomaly detection for pipeline metrics.
+- Build, compliance and deployment observability.
+- Synthetic monitoring.
+- Deployment-aware correlation.
+- Regulatory/audit evidence support.
+- Rollback alerts connected to the Day 8 rollback specification.
+
+The Day 8 rollback specification defines Category A immediate triggers (<60 seconds), Category B escalated triggers (<15 minutes), and Category C manual decisions. This file therefore keeps **rollback-critical alerts** separate from **operational warning/informational alerts**.
+
+> **Important:** Metric names below are the contract expected by the dashboards and application/pipeline instrumentation. Replace or adapt metric names when integrating with the real NovaPay exporters, CI/CD system, Kubernetes metrics, security scanners and synthetic-monitoring system.
+
+---
+
+## 2. Alert Severity Model
+
+```text
+                    PROMETHEUS
+                        |
+                        v
+                  Alert Evaluation
+                        |
+             +----------+----------+
+             |          |           |
+          CRITICAL    WARNING      INFO
+          Cat A       Cat B        Cat C
+             |          |           |
+             v          v           v
+        Immediate    Escalate     Observe /
+        rollback     <15 min      human review
+```
+
+### Critical / Category A
+
+Target: **<60 seconds**
+
+- HTTP 5xx >5% for 60s.
+- Three consecutive health failures.
+- OOMKill.
+- CrashLoopBackOff.
+- DB connection-pool exhaustion.
+- Critical synthetic payment failure.
+
+### Warning / Category B
+
+Target: **<15 minutes**
+
+- p99 latency >2× baseline for 5m.
+- Error-budget burn >10× normal for 10m.
+- Transaction success >2% below baseline.
+- CPU >90% for 5m.
+- Memory >85% for 5m.
+
+### Info / Category C
+
+Manual decision:
+
+- Gradual degradation below automated thresholds.
+- Customer-support reports.
+- Retroactive compliance failure.
+- Downstream dependency correlation.
+
+---
+
+## 3. PrometheusRule
+
+```yaml
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: novapay-observability-alerts
+  namespace: monitoring
+  labels:
+    app: novapay
+    component: observability
+    prometheus: kube-prometheus
+    role: alert-rules
+spec:
+  groups:
+    # ================================================================
+    # GROUP 1 — RECORDING RULES
+    # ================================================================
+    - name: novapay.observability.recording
+      interval: 30s
+      rules:
+
+        - record: novapay:http_error_rate:5m
+          expr: |
+            sum(rate(novapay_http_requests_total{
+              environment=~"production|staging",
+              status=~"5.."
+            }[5m]))
+            /
+            clamp_min(
+              sum(rate(novapay_http_requests_total{
+                environment=~"production|staging"
+              }[5m])),
+              0.001
+            )
+
+        - record: novapay:http_availability:5m
+          expr: |
+            1 - novapay:http_error_rate:5m
+
+        - record: novapay:payment_success_rate:5m
+          expr: |
+            sum(rate(novapay_payment_transactions_total{
+              environment="production",
+              status="success"
+            }[5m]))
+            /
+            clamp_min(
+              sum(rate(novapay_payment_transactions_total{
+                environment="production"
+              }[5m])),
+              0.001
+            )
+
+        - record: novapay:http_latency_p99:5m
+          expr: |
+            histogram_quantile(
+              0.99,
+              sum by (le) (
+                rate(novapay_http_request_duration_seconds_bucket{
+                  environment="production"
+                }[5m])
+              )
+            )
+
+        - record: novapay:error_budget_burn:10m
+          expr: |
+            novapay:http_error_rate:5m / 0.001
+
+        - record: novapay:cpu_utilization:5m
+          expr: |
+            100 *
+            avg(
+              rate(container_cpu_usage_seconds_total{
+                namespace="novapay",
+                container!="",
+                container!="POD"
+              }[5m])
+            )
+
+        - record: novapay:memory_utilization:5m
+          expr: |
+            100 *
+            avg(
+              container_memory_working_set_bytes{
+                namespace="novapay",
+                container!="",
+                container!="POD"
+              }
+              /
+              container_spec_memory_limit_bytes{
+                namespace="novapay",
+                container!="",
+                container!="POD"
+              }
+            )
+
+    # ================================================================
+    # GROUP 2 — CATEGORY A / IMMEDIATE ROLLBACK
+    # ================================================================
+    - name: novapay.observability.category-a
+      interval: 15s
+      rules:
+
+        # A1 — HTTP 5xx >5% for 60 seconds
+        - alert: NovaPayHTTP5xxCritical
+          expr: |
+            novapay:http_error_rate:5m > 0.05
+          for: 60s
+          labels:
+            severity: critical
+            rollback_category: A
+            action: immediate-rollback
+            service: novapay
+            owner: sre
+          annotations:
+            summary: "NovaPay HTTP 5xx rate exceeds 5%"
+            description: "HTTP 5xx error rate has exceeded 5% for at least 60 seconds."
+            threshold: ">5% for 60s"
+            rollback_action: "Trigger independent rollback path."
+            runbook: "runbooks/incident-playbook.md"
+            dashboard: "dashboards/grafana/engineering-dashboard.json"
+            evidence_required: "Alert ID, incident ID, deployment ID, Git SHA, timestamps and verification results."
+
+        # A2 — Three consecutive health failures
+        - alert: NovaPayHealthCheckCritical
+          expr: |
+            increase(novapay_health_check_failures_total{
+              environment="production"
+            }[30s]) >= 3
+          for: 0s
+          labels:
+            severity: critical
+            rollback_category: A
+            action: immediate-rollback
+            service: novapay
+            owner: sre
+          annotations:
+            summary: "NovaPay health checks failed three times"
+            description: "Three or more health-check failures were observed within the evaluation window."
+            threshold: "3 consecutive failures"
+            rollback_action: "Trigger independent rollback path."
+            runbook: "runbooks/incident-playbook.md"
+
+        # A3 — OOMKill
+        - alert: NovaPayOOMKilledCritical
+          expr: |
+            increase(kube_pod_container_status_restarts_total{
+              namespace="novapay"
+            }[2m]) > 0
+            and
+            max_over_time(
+              kube_pod_container_status_last_terminated_reason{
+                namespace="novapay",
+                reason="OOMKilled"
+              }[2m]
+            ) == 1
+          for: 0s
+          labels:
+            severity: critical
+            rollback_category: A
+            action: immediate-rollback
+            service: novapay
+            owner: sre
+          annotations:
+            summary: "NovaPay container experienced OOMKill"
+            description: "A NovaPay production container was restarted after an OOMKill event."
+            threshold: "OOMKill detected"
+            rollback_action: "Trigger independent rollback path."
+            runbook: "runbooks/incident-playbook.md"
+
+        # A4 — CrashLoopBackOff
+        - alert: NovaPayCrashLoopBackOffCritical
+          expr: |
+            max_over_time(
+              kube_pod_container_status_waiting_reason{
+                namespace="novapay",
+                reason="CrashLoopBackOff"
+              }[2m]
+            ) == 1
+          for: 30s
+          labels:
+            severity: critical
+            rollback_category: A
+            action: immediate-rollback
+            service: novapay
+            owner: sre
+          annotations:
+            summary: "NovaPay pod is in CrashLoopBackOff"
+            description: "A production NovaPay container is repeatedly failing to start."
+            threshold: "CrashLoopBackOff detected"
+            rollback_action: "Trigger independent rollback path."
+            runbook: "runbooks/incident-playbook.md"
+
+        # A5 — DB connection-pool exhaustion
+        - alert: NovaPayDBConnectionPoolExhaustedCritical
+          expr: |
+            (
+              novapay_db_pool_in_use{environment="production"}
+              /
+              clamp_min(
+                novapay_db_pool_max{environment="production"},
+                1
+              )
+            ) >= 1
+          for: 30s
+          labels:
+            severity: critical
+            rollback_category: A
+            action: immediate-rollback
+            service: novapay
+            owner: sre
+          annotations:
+            summary: "NovaPay DB connection pool is exhausted"
+            description: "Database connection usage has reached the configured maximum."
+            threshold: "Pool utilization >=100%"
+            rollback_action: "Trigger independent rollback path after correlation."
+            runbook: "runbooks/incident-playbook.md"
+
+        # A6 — Critical synthetic payment failure
+        - alert: NovaPaySyntheticPaymentCritical
+          expr: |
+            novapay_synthetic_payment_success{
+              environment="production",
+              transaction_type="critical"
+            } == 0
+          for: 0s
+          labels:
+            severity: critical
+            rollback_category: A
+            action: immediate-rollback
+            service: payments
+            owner: sre
+          annotations:
+            summary: "Critical NovaPay synthetic payment transaction failed"
+            description: "Synthetic monitoring detected failure of a critical payment journey."
+            threshold: "Critical synthetic payment failure"
+            rollback_action: "Trigger independent rollback path."
+            runbook: "runbooks/incident-playbook.md"
+            dashboard: "dashboards/grafana/engineering-dashboard.json"
+
+    # ================================================================
+    # GROUP 3 — CATEGORY B / ESCALATED
+    # ================================================================
+    - name: novapay.observability.category-b
+      interval: 30s
+      rules:
+
+        # B1 — p99 >2x baseline for 5m
+        - alert: NovaPayP99LatencyHigh
+          expr: |
+            novapay:http_latency_p99:5m
+            >
+            2 *
+            novapay_http_latency_baseline_seconds{
+              environment="production"
+            }
+          for: 5m
+          labels:
+            severity: warning
+            rollback_category: B
+            action: escalate
+            service: novapay
+            owner: oncall
+          annotations:
+            summary: "NovaPay p99 latency is >2x baseline"
+            description: "p99 latency has remained above twice the approved baseline for five minutes."
+            threshold: ">2x baseline for 5m"
+            rollback_action: "Escalate to on-call; rollback if policy requires."
+            runbook: "runbooks/incident-playbook.md"
+            dashboard: "dashboards/grafana/engineering-dashboard.json"
+
+        # B2 — Error-budget burn >10x normal for 10m
+        - alert: NovaPayErrorBudgetBurnHigh
+          expr: |
+            novapay:error_budget_burn:10m > 10
+          for: 10m
+          labels:
+            severity: warning
+            rollback_category: B
+            action: escalate
+            service: novapay
+            owner: oncall
+          annotations:
+            summary: "NovaPay error-budget burn exceeds 10x"
+            description: "Observed error rate is consuming the 99.9% availability error budget at more than 10x the allowed rate."
+            threshold: ">10x for 10m"
+            rollback_action: "Escalate; auto-rollback if escalation policy expires without response."
+            runbook: "runbooks/incident-playbook.md"
+
+        # B3 — Payment transaction success >2% below baseline
+        - alert: NovaPayPaymentSuccessDegraded
+          expr: |
+            (
+              novapay_payment_success_baseline_ratio{environment="production"}
+              -
+              novapay:payment_success_rate:5m
+            ) > 0.02
+          for: 5m
+          labels:
+            severity: warning
+            rollback_category: B
+            action: escalate
+            service: payments
+            owner: oncall
+          annotations:
+            summary: "NovaPay payment success is >2% below baseline"
+            description: "Payment transaction success rate is materially below its approved baseline."
+            threshold: ">2 percentage points below baseline"
+            rollback_action: "Escalate and correlate with deployment/customer impact."
+            runbook: "runbooks/incident-playbook.md"
+
+        # B4 — CPU >90% for 5m
+        - alert: NovaPayCPUHigh
+          expr: |
+            novapay:cpu_utilization:5m > 90
+          for: 5m
+          labels:
+            severity: warning
+            rollback_category: B
+            action: escalate
+            service: novapay
+            owner: oncall
+          annotations:
+            summary: "NovaPay CPU utilization exceeds 90%"
+            description: "Average application CPU utilization has remained above 90% for five minutes."
+            threshold: ">90% for 5m"
+            rollback_action: "Escalate; correlate with traffic and recent deployment."
+            runbook: "runbooks/incident-playbook.md"
+
+        # B5 — Memory >85% for 5m
+        - alert: NovaPayMemoryHigh
+          expr: |
+            novapay:memory_utilization:5m > 85
+          for: 5m
+          labels:
+            severity: warning
+            rollback_category: B
+            action: escalate
+            service: novapay
+            owner: oncall
+          annotations:
+            summary: "NovaPay memory utilization exceeds 85%"
+            description: "Application memory utilization has remained above 85% for five minutes."
+            threshold: ">85% for 5m"
+            rollback_action: "Escalate; correlate with deployment and OOM risk."
+            runbook: "runbooks/incident-playbook.md"
+
+    # ================================================================
+    # GROUP 4 — AUTOSCALING / PERFORMANCE SIGNALS
+    # ================================================================
+    - name: novapay.observability.performance
+      interval: 30s
+      rules:
+
+        - alert: NovaPayCPUAutoscalingSignal
+          expr: |
+            avg(
+              rate(container_cpu_usage_seconds_total{
+                namespace="novapay",
+                container!="",
+                container!="POD"
+              }[5m])
+            ) > 0.70
+          for: 5m
+          labels:
+            severity: info
+            alert_type: autoscaling-signal
+            service: novapay
+          annotations:
+            summary: "NovaPay CPU is above autoscaling trigger"
+            description: "CPU utilization is above the assessment scenario trigger of 70%."
+            threshold: ">70% for 5m"
+            action: "Evaluate/allow horizontal pod autoscaling."
+
+        - alert: NovaPayQueueDepthAutoscalingSignal
+          expr: |
+            max(
+              novapay_rabbitmq_queue_depth{environment="production"}
+            ) > 1000
+          for: 5m
+          labels:
+            severity: info
+            alert_type: autoscaling-signal
+            service: messaging
+          annotations:
+            summary: "NovaPay queue depth exceeds 1000"
+            description: "Queue depth is above the assessment scenario autoscaling trigger."
+            threshold: ">1000 for 5m"
+            action: "Evaluate/allow horizontal scaling and consumer capacity."
+
+        - alert: NovaPayP99PerformanceSignal
+          expr: |
+            novapay:http_latency_p99:5m > 0.300
+          for: 5m
+          labels:
+            severity: info
+            alert_type: performance-signal
+            service: novapay
+          annotations:
+            summary: "NovaPay p99 latency exceeds 300ms"
+            description: "p99 latency has exceeded the assessment scenario performance threshold."
+            threshold: ">300ms for 5m"
+            action: "Investigate performance regression and deployment correlation."
+
+    # ================================================================
+    # GROUP 5 — BUILD / CI PIPELINE
+    # ================================================================
+    - name: novapay.observability.pipeline-build
+      interval: 60s
+      rules:
+
+        - alert: NovaPayBuildSuccessRateLow
+          expr: |
+            100 *
+            sum(increase(novapay_build_success_total[1h]))
+            /
+            clamp_min(sum(increase(novapay_build_total[1h])), 1)
+            < 95
+          for: 15m
+          labels:
+            severity: warning
+            category: pipeline-build
+            owner: devops
+          annotations:
+            summary: "NovaPay build success rate is below 95%"
+            description: "Build success rate has remained below the assessment target."
+            threshold: "<95%"
+            action: "Investigate failing/flaky tests, dependencies and build infrastructure."
+
+        - alert: NovaPayBuildDurationAnomaly
+          expr: |
+            novapay_pipeline_build_duration_seconds:current
+            >
+            2 *
+            novapay_pipeline_build_duration_seconds:baseline
+          for: 15m
+          labels:
+            severity: warning
+            category: pipeline-build
+            owner: devops
+          annotations:
+            summary: "NovaPay build duration is anomalously high"
+            description: "Current build duration is more than twice its baseline."
+            threshold: ">2x baseline for 15m"
+            action: "Investigate runner capacity, dependencies and cache behavior."
+
+        - alert: NovaPayFlakyTestRateHigh
+          expr: |
+            novapay_flaky_test_rate > 0.05
+          for: 30m
+          labels:
+            severity: warning
+            category: pipeline-build
+            owner: devops
+          annotations:
+            summary: "NovaPay flaky test rate is above 5%"
+            description: "The flaky test rate has exceeded the operational threshold."
+            threshold: ">5% for 30m"
+            action: "Quarantine and remediate flaky tests."
+
+    # ================================================================
+    # GROUP 6 — SECURITY / COMPLIANCE GATES
+    # ================================================================
+    - name: novapay.observability.compliance
+      interval: 60s
+      rules:
+
+        - alert: NovaPayComplianceGateFailure
+          expr: |
+            novapay_pipeline_gate_status{
+              environment=~"staging|preprod|production",
+              status="failed"
+            } == 1
+          for: 0s
+          labels:
+            severity: critical
+            category: compliance
+            action: block-promotion
+            owner: compliance
+          annotations:
+            summary: "NovaPay compliance gate failed"
+            description: "A mandatory compliance/policy gate has failed."
+            threshold: "Mandatory gate status = failed"
+            action: "Block promotion and preserve evidence."
+            runbook: "runbooks/deployment-runbook.md"
+
+        - alert: NovaPayCriticalSecurityFinding
+          expr: |
+            novapay_security_critical_findings{
+              environment=~"staging|preprod|production"
+            } > 0
+          for: 0s
+          labels:
+            severity: critical
+            category: security
+            action: block-promotion
+            owner: security
+          annotations:
+            summary: "NovaPay critical security finding detected"
+            description: "One or more critical security findings are associated with the release."
+            threshold: "Critical findings >0"
+            action: "Block promotion until remediated or formally excepted."
+
+        - alert: NovaPayExceptionExpiryRisk
+          expr: |
+            novapay_compliance_exception_expiry_seconds{
+              environment="production"
+            } < 7 * 24 * 3600
+          for: 1h
+          labels:
+            severity: warning
+            category: compliance
+            owner: compliance
+          annotations:
+            summary: "NovaPay compliance exception expires within 7 days"
+            description: "An approved exception is approaching its expiry date."
+            threshold: "<7 days to expiry"
+            action: "Review, renew or remediate before expiry."
+
+        - alert: NovaPayEvidenceIncomplete
+          expr: |
+            novapay_evidence_complete{
+              environment="production"
+            } == 0
+          for: 15m
+          labels:
+            severity: warning
+            category: audit
+            owner: compliance
+          annotations:
+            summary: "NovaPay required deployment evidence is incomplete"
+            description: "Required audit evidence has not been marked complete."
+            threshold: "Evidence completeness = 0"
+            action: "Complete evidence capture before closing the deployment/incident."
+
+    # ================================================================
+    # GROUP 7 — DEPLOYMENT / CHANGE CORRELATION
+    # ================================================================
+    - name: novapay.observability.deployment-correlation
+      interval: 30s
+      rules:
+
+        - alert: NovaPayPostDeploymentErrorSpike
+          expr: |
+            novapay:http_error_rate:5m > 0.02
+            and
+            increase(novapay_deployment_total{environment="production"}[15m]) > 0
+          for: 3m
+          labels:
+            severity: warning
+            category: deployment-correlation
+            owner: sre
+          annotations:
+            summary: "Error spike correlated with recent deployment"
+            description: "Production error rate is elevated and a deployment occurred within the correlation window."
+            threshold: ">2% errors with deployment in last 15m"
+            action: "Correlate Git SHA, image digest, routing state and release health."
+
+        - alert: NovaPayPostDeploymentLatencySpike
+          expr: |
+            novapay:http_latency_p99:5m
+            >
+            2 *
+            novapay_http_latency_baseline_seconds{
+              environment="production"
+            }
+            and
+            increase(novapay_deployment_total{environment="production"}[15m]) > 0
+          for: 5m
+          labels:
+            severity: warning
+            category: deployment-correlation
+            owner: sre
+          annotations:
+            summary: "Latency regression correlated with recent deployment"
+            description: "p99 latency is more than twice baseline following a recent production deployment."
+            threshold: ">2x baseline with deployment in last 15m"
+            action: "Inspect canary/blue-green metrics and rollback if policy requires."
+
+        - alert: NovaPayRollbackEvent
+          expr: |
+            increase(novapay_rollback_total{
+              environment="production"
+            }[5m]) > 0
+          for: 0s
+          labels:
+            severity: info
+            category: rollback
+            owner: sre
+          annotations:
+            summary: "NovaPay rollback event detected"
+            description: "A production rollback has been recorded."
+            action: "Correlate rollback ID, incident ID, release revision and verification evidence."
+
+    # ================================================================
+    # GROUP 8 — SYNTHETIC / CUSTOMER JOURNEY
+    # ================================================================
+    - name: novapay.observability.synthetic
+      interval: 30s
+      rules:
+
+        - alert: NovaPaySyntheticPaymentDegraded
+          expr: |
+            (
+              sum(rate(novapay_synthetic_payment_success_total{
+                environment="production",
+                status="success"
+              }[10m]))
+              /
+              clamp_min(
+                sum(rate(novapay_synthetic_payment_total{
+                  environment="production"
+                }[10m])),
+                0.001
+              )
+            ) < 0.98
+          for: 5m
+          labels:
+            severity: warning
+            category: synthetic
+            owner: oncall
+          annotations:
+            summary: "NovaPay synthetic payment success is below 98%"
+            description: "Synthetic payment journey success has degraded."
+            threshold: "<98% for 5m"
+            action: "Investigate customer journey and deployment correlation."
+
+    # ================================================================
+    # GROUP 9 — ANOMALY DETECTION FOR PIPELINE METRICS
+    # ================================================================
+    - name: novapay.observability.anomaly-detection
+      interval: 60s
+      rules:
+
+        - alert: NovaPayPipelineDurationAnomaly
+          expr: |
+            abs(
+              novapay_pipeline_duration_seconds
+              -
+              avg_over_time(novapay_pipeline_duration_seconds[7d])
+            )
+            >
+            3 *
+            stddev_over_time(novapay_pipeline_duration_seconds[7d])
+          for: 15m
+          labels:
+            severity: warning
+            category: anomaly
+            owner: devops
+          annotations:
+            summary: "NovaPay pipeline duration anomaly detected"
+            description: "Pipeline duration is more than three standard deviations from its seven-day rolling baseline."
+            threshold: ">3 standard deviations from 7-day baseline"
+            action: "Investigate build, compliance and deployment stage latency."
+
+        - alert: NovaPayDeploymentFrequencyAnomaly
+          expr: |
+            abs(
+              increase(novapay_deployment_total{environment="production"}[1d])
+              -
+              avg_over_time(
+                increase(novapay_deployment_total{environment="production"}[1d])[7d:1d]
+              )
+            )
+            >
+            2 *
+            stddev_over_time(
+              increase(novapay_deployment_total{environment="production"}[1d])[7d:1d]
+            )
+          for: 1h
+          labels:
+            severity: info
+            category: anomaly
+            owner: devops
+          annotations:
+            summary: "NovaPay deployment-frequency anomaly detected"
+            description: "Daily production deployment frequency differs materially from the recent baseline."
+            threshold: ">2 standard deviations from rolling baseline"
+            action: "Review release cadence, freezes, incidents and change volume."
+
+    # ================================================================
+    # GROUP 10 — SLO / AVAILABILITY
+    # ================================================================
+    - name: novapay.observability.slo
+      interval: 30s
+      rules:
+
+        - alert: NovaPayAvailabilitySLOAtRisk
+          expr: |
+            novapay:http_availability:5m < 0.999
+          for: 5m
+          labels:
+            severity: warning
+            category: slo
+            owner: sre
+          annotations:
+            summary: "NovaPay availability is below the 99.9% SLO"
+            description: "The observed availability SLI is below the NovaPay 99.9% availability objective."
+            threshold: "<99.9% for 5m"
+            action: "Investigate SLO burn and customer impact."
+
+        - alert: NovaPaySLOBurnCritical
+          expr: |
+            novapay:error_budget_burn:10m > 10
+          for: 10m
+          labels:
+            severity: critical
+            rollback_category: B
+            category: slo
+            action: escalate
+            owner: sre
+          annotations:
+            summary: "NovaPay SLO error-budget burn is critical"
+            description: "Error-budget burn has exceeded the assessment's 10x escalation threshold."
+            threshold: ">10x for 10m"
+            action: "Escalate immediately; auto-rollback according to policy if no response."
+
+    # ================================================================
+    # GROUP 11 — HIGH-TRAFFIC WINDOW READINESS
+    # ================================================================
+    - name: novapay.observability.high-traffic
+      interval: 60s
+      rules:
+
+        - alert: NovaPayHighTrafficPerformanceTestMissing
+          expr: |
+            novapay_high_traffic_window_active{environment="production"} == 1
+            and
+            novapay_performance_test_status{environment="production"} != 1
+          for: 10m
+          labels:
+            severity: warning
+            category: high-traffic
+            owner: devops
+          annotations:
+            summary: "NovaPay high-traffic window lacks successful performance-test evidence"
+            description: "A defined high-traffic period is active but required performance-test evidence is not successful."
+            threshold: "High-traffic window active and performance test != success"
+            action: "Review deployment/performance-test policy before continuing changes."
+
+        - alert: NovaPayDeploymentNearHighTrafficWindow
+          expr: |
+            novapay_deployment_near_high_traffic_window{environment="production"} == 1
+          for: 0s
+          labels:
+            severity: info
+            category: high-traffic
+            owner: devops
+          annotations:
+            summary: "NovaPay deployment is near a high-traffic window"
+            description: "Deployment timing overlaps or approaches a defined high-traffic period."
+            threshold: "High-traffic proximity signal = 1"
+            action: "Check performance-test evidence and deployment freeze policy."
+
+    # ================================================================
+    # GROUP 12 — REGULATORY INCIDENT DURATION
+    # ================================================================
+    - name: novapay.observability.regulatory
+      interval: 60s
+      rules:
+
+        - alert: NovaPayTechnologyIncidentRBIReportingThreshold
+          expr: |
+            novapay_incident_duration_seconds{
+              environment="production",
+              regulatory_relevance="technology"
+            } > 30 * 60
+          for: 0s
+          labels:
+            severity: critical
+            category: regulatory
+            owner: compliance
+            action: regulatory-notification
+          annotations:
+            summary: "NovaPay technology incident exceeded 30-minute reporting threshold"
+            description: "A technology incident has exceeded the assessment scenario's 30-minute RBI reporting threshold."
+            threshold: ">30 minutes"
+            action: "Start approved regulatory notification workflow and preserve evidence."
+            runbook: "runbooks/incident-playbook.md"
+            dashboard: "dashboards/grafana/regulatory-dashboard.json"
+
+        - alert: NovaPayAuditTrailMissing
+          expr: |
+            novapay_security_audit_log_coverage{
+              environment="production"
+            } < 1
+          for: 15m
+          labels:
+            severity: warning
+            category: regulatory
+            owner: compliance
+          annotations:
+            summary: "NovaPay security audit-log coverage is incomplete"
+            description: "Security-relevant activity is not fully represented in the expected audit trail."
+            threshold: "<100% coverage"
+            action: "Investigate logging pipeline and preserve affected evidence."
+```
+
+---
+
+## 4. Alert Routing Contract
+
+The rules intentionally attach machine-readable labels so Alertmanager can route them independently:
+
+```yaml
+severity:
+  critical | warning | info
+
+rollback_category:
+  A | B
+
+action:
+  immediate-rollback
+  escalate
+  block-promotion
+  regulatory-notification
+  autoscaling-signal
+```
+
+Recommended routing:
+
+```text
+CRITICAL / Category A
+        |
+        +--> SRE Pager
+        +--> Incident channel
+        +--> Independent rollback controller
+        +--> Audit evidence
+
+WARNING / Category B
+        |
+        +--> On-call
+        +--> Incident channel
+        +--> Escalation timer
+        +--> Rollback if policy requires
+
+COMPLIANCE / SECURITY
+        |
+        +--> Compliance/Security
+        +--> Release owner
+        +--> Block promotion
+
+REGULATORY
+        |
+        +--> Compliance
+        +--> Incident Commander
+        +--> Approved RBI notification workflow
+
+INFO / Category C
+        |
+        +--> Dashboard
+        +--> Incident channel when correlated
+        +--> Human decision
+```
+
+Alertmanager routing remains responsible for notification, grouping, deduplication, inhibition and escalation. **Alertmanager itself should not be treated as the rollback engine.** The rollback action must use the independent rollback path defined by the Day 8 specification.
+
+---
+
+## 5. Required Alert Annotations
+
+Every actionable alert should provide:
+
+```yaml
+summary:
+description:
+threshold:
+action:
+runbook:
+dashboard:
+```
+
+For rollback-critical alerts, retain evidence for:
+
+```text
+rollback ID
+incident ID
+trigger category
+metric
+threshold
+detection timestamp
+deployment ID
+Git SHA
+candidate image digest
+stable image digest
+Istio routing state
+Argo CD revision
+feature-flag state
+rollback timestamp
+verification results
+customer impact
+approval/escalation records
+final incident status
+```
+
+This supports the assessment requirement for audit-ready rollback evidence.
+
+---
+
+## 6. SLO and Error Budget
+
+NovaPay uses:
+
+```text
+Availability SLO = 99.9%
+
+Allowed error rate = 0.1%
+
+30-day error budget = 43.2 minutes
+
+Burn Rate = Observed Error Rate / Allowed Error Rate
+```
+
+Example:
+
+```text
+Observed error rate = 1%
+Allowed error rate  = 0.1%
+
+Burn Rate = 10x
+```
+
+The assessment's rollback policy treats **>10x normal burn for 10 minutes** as a Category B escalation condition.
+
+---
+
+## 7. Integration With Grafana
+
+These alerts are intended to feed the three Day 10 dashboards:
+
+```text
+Prometheus
+    |
+    +--> Engineering Dashboard
+    |      - SLO
+    |      - 5xx
+    |      - p99
+    |      - CPU / memory
+    |      - payment success
+    |      - rollback
+    |
+    +--> Management Dashboard
+    |      - DORA
+    |      - build health
+    |      - deployment/change risk
+    |
+    +--> Regulatory Dashboard
+           - compliance gates
+           - evidence
+           - exceptions
+           - incidents
+           - RBI / PCI-DSS evidence
+```
+
+---
+
+## 8. Validation Before Production
+
+Run Prometheus rule validation before applying the file:
+
+```bash
+promtool check rules prometheus/observability-alerts.yaml
+```
+
+Then validate the Kubernetes object:
+
+```bash
+kubectl apply --dry-run=client \
+  -f prometheus/observability-alerts.yaml
+```
+
+After deployment:
+
+```bash
+kubectl -n monitoring get prometheusrule novapay-observability-alerts
+```
+
+Check Prometheus rules:
+
+```bash
+kubectl -n monitoring port-forward svc/prometheus-operated 9090:9090
+```
+
+Then inspect:
+
+```text
+http://localhost:9090/rules
+```
+
+For each critical alert, test the corresponding metric condition in a non-production environment before enabling automatic rollback.
+
+---
+
+## 9. Evidence
+
+Store genuine execution evidence under:
+
+```text
+evidence/
+├── screenshots/
+│   ├── prometheus-alert.png
+│   ├── alertmanager-routing.png
+│   └── engineering-dashboard.png
+│
+└── test-results/
+    ├── alert-rule-validation.txt
+    ├── alert-routing-results.json
+    ├── slo-test-results.json
+    └── rollback-verification.json
+```
+
+Do **not** create fictional alert screenshots or test results. Capture them only after the rules are actually tested.
+
+---
+
+## 10. Day 10 Acceptance Mapping
+
+| Assessment requirement | Implemented in this file |
+|---|---|
+| Prometheus alerting | Yes |
+| Severity-based routing | Critical / Warning / Info |
+| Category A | 6 immediate triggers |
+| Category B | 5 escalation triggers |
+| SLO monitoring | 99.9% availability + burn rate |
+| Error-budget monitoring | 10x burn alert |
+| Build observability | Build success, duration, flaky tests |
+| Compliance observability | Gate failures, findings, exceptions, evidence |
+| Deployment observability | Deployment/error/latency correlation |
+| Synthetic monitoring | Critical and degraded payment journey |
+| Anomaly detection | Pipeline duration and deployment frequency |
+| Autoscaling signals | CPU >70%, queue >1000 |
+| Performance signal | p99 >300ms |
+| Regulatory reporting | >30-minute technology incident signal |
+| Audit evidence | Required rollback/evidence annotations |
+| Grafana integration | Engineering/Management/Regulatory dashboards |
+
+---
+
+## 11. Repository Location
+
+```text
+project/
+│
+├── dashboards/
+│   └── grafana/
+│       ├── engineering-dashboard.json
+│       ├── management-dashboard.json
+│       └── regulatory-dashboard.json
+│
+├── prometheus/
+│   └── observability-alerts.yaml
+│
+├── pipeline/
+│   └── monitoring/
+│       ├── rollback-alerts.yaml
+│       └── alertmanager.yaml
+│
+└── evidence/
+    ├── screenshots/
+    └── test-results/
+```
+
+## 12. Relationship to Day 8
+
+```text
+Day 10 Observability
+        |
+        v
+prometheus/observability-alerts.yaml
+        |
+        v
+Alertmanager
+        |
+        v
+Severity / Category
+        |
+   +----+----+
+   |         |
+Cat A      Cat B
+   |         |
+<60s       <15m
+   |         |
+   v         v
+Independent Rollback / Escalation
+        |
+        v
+Day 8 rollback-specification.md
+        |
+        v
+Verify → Notify → Incident → Postmortem
+```
+
+The assessment explicitly requires the Day 10 output to include an observability document, dashboard mockups and alerting rules. This file is the **Prometheus alerting-rules component** of that deliverable.

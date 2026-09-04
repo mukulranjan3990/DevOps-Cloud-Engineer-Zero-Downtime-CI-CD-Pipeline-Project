@@ -1,0 +1,612 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_PROMETHEUS",
+      "label": "Prometheus",
+      "description": "Prometheus datasource used by the NovaPay observability dashboards.",
+      "type": "datasource",
+      "pluginId": "prometheus",
+      "pluginName": "Prometheus"
+    }
+  ],
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "10.0.0"
+    },
+    {
+      "type": "datasource",
+      "id": "prometheus",
+      "name": "Prometheus",
+      "version": "1.0.0"
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "links": [],
+  "panels": [
+    {
+      "id": 1,
+      "title": "Deployment Frequency",
+      "type": "stat",
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "targets": [
+        {
+          "expr": "sum(increase(novapay_deployment_total{environment=\"production\"}[30d])) / 30",
+          "refId": "A",
+          "legendFormat": "{{environment}}",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "description": "DORA: production deployments per day. Target: multiple per day."
+    },
+    {
+      "id": 2,
+      "title": "Lead Time for Changes",
+      "type": "stat",
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 6,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "h"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "targets": [
+        {
+          "expr": "avg(novapay_lead_time_seconds{environment=\"production\"}) / 3600",
+          "refId": "A",
+          "legendFormat": "{{environment}}",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "description": "DORA: average commit-to-production time. Target: <1 hour."
+    },
+    {
+      "id": 3,
+      "title": "Change Failure Rate",
+      "type": "stat",
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "targets": [
+        {
+          "expr": "100 * sum(increase(novapay_change_failure_total{environment=\"production\"}[30d])) / sum(increase(novapay_deployment_total{environment=\"production\"}[30d]))",
+          "refId": "A",
+          "legendFormat": "{{environment}}",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "description": "DORA: (rollbacks + hotfixes) / total deployments \u00d7 100. Target: <5%."
+    },
+    {
+      "id": 4,
+      "title": "MTTR",
+      "type": "stat",
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 18,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "h"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "targets": [
+        {
+          "expr": "avg(novapay_incident_duration_seconds{environment=\"production\"}) / 3600",
+          "refId": "A",
+          "legendFormat": "{{environment}}",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "description": "DORA: detection-to-resolution. Target: <1 hour."
+    },
+    {
+      "id": 5,
+      "title": "Build Success Rate",
+      "type": "stat",
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 0,
+        "y": 5
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "targets": [
+        {
+          "expr": "100 * sum(increase(novapay_build_success_total[30d])) / sum(increase(novapay_build_total[30d]))",
+          "refId": "A",
+          "legendFormat": "{{environment}}",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "description": "Assessment target: >95%."
+    },
+    {
+      "id": 6,
+      "title": "SLO Compliance",
+      "type": "stat",
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 6,
+        "y": 5
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "targets": [
+        {
+          "expr": "100 * (1 - sum(rate(novapay_http_requests_total{environment=\"production\",status=~\"5..\"}[30d])) / sum(rate(novapay_http_requests_total{environment=\"production\"}[30d])))",
+          "refId": "A",
+          "legendFormat": "{{environment}}",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "description": "Production availability SLO target: 99.9%."
+    },
+    {
+      "id": 7,
+      "title": "Rollback Frequency",
+      "type": "stat",
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 12,
+        "y": 5
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "targets": [
+        {
+          "expr": "sum(increase(novapay_rollback_total{environment=\"production\"}[30d]))",
+          "refId": "A",
+          "legendFormat": "{{environment}}",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "description": "Rollback count over the selected executive period."
+    },
+    {
+      "id": 8,
+      "title": "Open Critical Incidents",
+      "type": "stat",
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 18,
+        "y": 5
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "targets": [
+        {
+          "expr": "sum(novapay_incident_open{severity=\"critical\"})",
+          "refId": "A",
+          "legendFormat": "{{environment}}",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "description": "Current unresolved critical incidents."
+    },
+    {
+      "id": 9,
+      "title": "DORA Trend \u2014 Deployment Frequency",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 10
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "targets": [
+        {
+          "expr": "sum by (environment) (increase(novapay_deployment_total{environment=\"production\"}[1d]))",
+          "refId": "A",
+          "legendFormat": "Deployments/day",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "description": "Daily deployment frequency trend."
+    },
+    {
+      "id": 10,
+      "title": "DORA Trend \u2014 Lead Time",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 10
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "h"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "targets": [
+        {
+          "expr": "avg_over_time(novapay_lead_time_seconds{environment=\"production\"}[1d]) / 3600",
+          "refId": "A",
+          "legendFormat": "Lead time (h)",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "description": "Daily average lead time."
+    },
+    {
+      "id": 11,
+      "title": "DORA Trend \u2014 Change Failure Rate",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 18
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "targets": [
+        {
+          "expr": "100 * sum(increase(novapay_change_failure_total{environment=\"production\"}[1d])) / sum(increase(novapay_deployment_total{environment=\"production\"}[1d]))",
+          "refId": "A",
+          "legendFormat": "Failure rate",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "description": "Daily change failure rate."
+    },
+    {
+      "id": 12,
+      "title": "DORA Trend \u2014 MTTR",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 18
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "h"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "targets": [
+        {
+          "expr": "avg_over_time(novapay_incident_duration_seconds{environment=\"production\"}[1d]) / 3600",
+          "refId": "A",
+          "legendFormat": "MTTR (h)",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "description": "Daily MTTR trend."
+    },
+    {
+      "id": 13,
+      "title": "Pipeline Health \u2014 Build / Compliance / Deploy",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 26
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "targets": [
+        {
+          "expr": "100 * sum(increase(novapay_build_success_total[7d])) / sum(increase(novapay_build_total[7d]))",
+          "refId": "A",
+          "legendFormat": "Build success",
+          "range": true,
+          "instant": false
+        },
+        {
+          "expr": "100 * sum(increase(novapay_pipeline_gate_pass_total[7d])) / sum(increase(novapay_pipeline_gate_total[7d]))",
+          "refId": "B",
+          "legendFormat": "Gate pass",
+          "range": true,
+          "instant": false
+        },
+        {
+          "expr": "100 * sum(increase(novapay_deployment_success_total[7d])) / sum(increase(novapay_deployment_total[7d]))",
+          "refId": "C",
+          "legendFormat": "Deployment success",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "description": "Weekly pipeline health."
+    },
+    {
+      "id": 14,
+      "title": "Payment Success & Customer Impact",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 26
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "targets": [
+        {
+          "expr": "100 * sum(rate(novapay_payment_transactions_total{environment=\"production\",status=\"success\"}[1h])) / sum(rate(novapay_payment_transactions_total{environment=\"production\"}[1h]))",
+          "refId": "A",
+          "legendFormat": "Payment success",
+          "range": true,
+          "instant": false
+        },
+        {
+          "expr": "sum(rate(novapay_customer_impact_events_total{environment=\"production\"}[1h]))",
+          "refId": "B",
+          "legendFormat": "Customer impact events",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "description": "Business outcome trend alongside customer impact."
+    },
+    {
+      "id": 15,
+      "title": "High-Traffic Window Readiness",
+      "type": "table",
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 34
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "targets": [
+        {
+          "expr": "novapay_high_traffic_window_active",
+          "refId": "A",
+          "legendFormat": "Window active",
+          "range": true,
+          "instant": false
+        },
+        {
+          "expr": "novapay_performance_test_status",
+          "refId": "B",
+          "legendFormat": "Performance test",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "description": "Use before salary days (1st/7th/15th), month-end (28th\u201331st), festivals, RBI settlement windows, filing deadlines and major campaigns."
+    }
+  ],
+  "refresh": "5m",
+  "schemaVersion": 39,
+  "style": "dark",
+  "tags": [
+    "novapay",
+    "observability",
+    "management",
+    "dora"
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "environment",
+        "label": "Environment",
+        "type": "query",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "query": "label_values(novapay_http_requests_total, environment)",
+        "includeAll": true,
+        "multi": true,
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        }
+      },
+      {
+        "name": "service",
+        "label": "Service",
+        "type": "query",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "query": "label_values(novapay_http_requests_total{environment=~\"$environment\"}, service)",
+        "includeAll": true,
+        "multi": true,
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        }
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "NovaPay Management \u2014 Weekly / Monthly Executive",
+  "uid": "novapay-management",
+  "version": 1,
+  "description": "Day 10 Deliverable 8 management dashboard. Audience: engineering leadership, product/business leadership and program governance. Focuses on the four DORA metrics, SLO, build health, rollback/change risk, customer impact and high-traffic readiness.",
+  "weekStart": ""
+}

@@ -1,0 +1,631 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_PROMETHEUS",
+      "label": "Prometheus",
+      "description": "Prometheus datasource used by the NovaPay observability dashboards.",
+      "type": "datasource",
+      "pluginId": "prometheus",
+      "pluginName": "Prometheus"
+    }
+  ],
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "10.0.0"
+    },
+    {
+      "type": "datasource",
+      "id": "prometheus",
+      "name": "Prometheus",
+      "version": "1.0.0"
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "links": [],
+  "panels": [
+    {
+      "id": 1,
+      "title": "Compliance Gate Pass Rate",
+      "type": "stat",
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "targets": [
+        {
+          "expr": "100 * sum(increase(novapay_pipeline_gate_pass_total{environment=\"production\"}[30d])) / sum(increase(novapay_pipeline_gate_total{environment=\"production\"}[30d]))",
+          "refId": "A",
+          "legendFormat": "{{environment}}",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "description": "Overall compliance/pipeline gate pass rate."
+    },
+    {
+      "id": 2,
+      "title": "Evidence Completeness",
+      "type": "stat",
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 6,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "targets": [
+        {
+          "expr": "100 * sum(novapay_evidence_complete) / count(novapay_evidence_complete)",
+          "refId": "A",
+          "legendFormat": "{{environment}}",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "description": "Percentage of required deployment/compliance evidence marked complete."
+    },
+    {
+      "id": 3,
+      "title": "Open Exceptions",
+      "type": "stat",
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "targets": [
+        {
+          "expr": "sum(novapay_compliance_exception_open{environment=\"production\"})",
+          "refId": "A",
+          "legendFormat": "{{environment}}",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "description": "Open approved exceptions requiring governance visibility."
+    },
+    {
+      "id": 4,
+      "title": "Exceptions Nearing Expiry",
+      "type": "stat",
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 18,
+        "y": 0
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "targets": [
+        {
+          "expr": "sum(novapay_compliance_exception_expiry_risk{environment=\"production\"})",
+          "refId": "A",
+          "legendFormat": "{{environment}}",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "description": "Exceptions approaching expiry and requiring review."
+    },
+    {
+      "id": 5,
+      "title": "SAST / DAST / Dependency / Policy Gates",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 5
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "targets": [
+        {
+          "expr": "100 * sum(increase(novapay_sast_gate_pass_total[30d])) / sum(increase(novapay_sast_gate_total[30d]))",
+          "refId": "A",
+          "legendFormat": "SAST",
+          "range": true,
+          "instant": false
+        },
+        {
+          "expr": "100 * sum(increase(novapay_dast_gate_pass_total[30d])) / sum(increase(novapay_dast_gate_total[30d]))",
+          "refId": "B",
+          "legendFormat": "DAST",
+          "range": true,
+          "instant": false
+        },
+        {
+          "expr": "100 * sum(increase(novapay_dependency_gate_pass_total[30d])) / sum(increase(novapay_dependency_gate_total[30d]))",
+          "refId": "C",
+          "legendFormat": "Dependency",
+          "range": true,
+          "instant": false
+        },
+        {
+          "expr": "100 * sum(increase(novapay_policy_gate_pass_total[30d])) / sum(increase(novapay_policy_gate_total[30d]))",
+          "refId": "D",
+          "legendFormat": "OPA/Kyverno",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "description": "Security and policy gate results supporting audit evidence."
+    },
+    {
+      "id": 6,
+      "title": "Critical Findings",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 5
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "targets": [
+        {
+          "expr": "sum(novapay_security_critical_findings{environment=\"production\"})",
+          "refId": "A",
+          "legendFormat": "Critical findings",
+          "range": true,
+          "instant": false
+        },
+        {
+          "expr": "sum(novapay_security_high_findings{environment=\"production\"})",
+          "refId": "B",
+          "legendFormat": "High findings",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "description": "Security findings requiring remediation or documented exception."
+    },
+    {
+      "id": 7,
+      "title": "Production Changes by Status",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 13
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "targets": [
+        {
+          "expr": "sum(increase(novapay_deployment_success_total{environment=\"production\"}[30d]))",
+          "refId": "A",
+          "legendFormat": "Successful",
+          "range": true,
+          "instant": false
+        },
+        {
+          "expr": "sum(increase(novapay_rollback_total{environment=\"production\"}[30d]))",
+          "refId": "B",
+          "legendFormat": "Rollbacks",
+          "range": true,
+          "instant": false
+        },
+        {
+          "expr": "sum(increase(novapay_hotfix_total{environment=\"production\"}[30d]))",
+          "refId": "C",
+          "legendFormat": "Hotfixes",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "description": "Controlled production changes and failed-change recovery evidence."
+    },
+    {
+      "id": 8,
+      "title": "Approvals & Segregation of Duties",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 13
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "targets": [
+        {
+          "expr": "sum(increase(novapay_approval_total{environment=\"production\",status=\"approved\"}[30d]))",
+          "refId": "A",
+          "legendFormat": "Approved",
+          "range": true,
+          "instant": false
+        },
+        {
+          "expr": "sum(increase(novapay_approval_total{environment=\"production\",status=\"rejected\"}[30d]))",
+          "refId": "B",
+          "legendFormat": "Rejected",
+          "range": true,
+          "instant": false
+        },
+        {
+          "expr": "sum(increase(novapay_sod_violation_total{environment=\"production\"}[30d]))",
+          "refId": "C",
+          "legendFormat": "SoD violations",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "description": "Approval evidence and segregation-of-duties monitoring."
+    },
+    {
+      "id": 9,
+      "title": "Rollback Audit Evidence",
+      "type": "table",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 21
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "targets": [
+        {
+          "expr": "novapay_rollback_evidence_complete{environment=\"production\"}",
+          "refId": "A",
+          "legendFormat": "{{rollback_id}}",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "description": "Track rollback ID, incident ID, trigger category, deployment ID, Git SHA, image digests, routing state, Argo CD revision, feature flags, timestamps and verification results."
+    },
+    {
+      "id": 10,
+      "title": "Deployment Traceability",
+      "type": "table",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 21
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "targets": [
+        {
+          "expr": "novapay_deployment_traceability{environment=\"production\"}",
+          "refId": "A",
+          "legendFormat": "{{deployment_id}}",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "description": "Trace production deployment to Git SHA, artifact, approval, environment, deployment timestamp and verification result."
+    },
+    {
+      "id": 11,
+      "title": "RBI / PCI-DSS Evidence Status",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 29
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "targets": [
+        {
+          "expr": "100 * sum(novapay_rbi_evidence_complete) / count(novapay_rbi_evidence_complete)",
+          "refId": "A",
+          "legendFormat": "RBI evidence",
+          "range": true,
+          "instant": false
+        },
+        {
+          "expr": "100 * sum(novapay_pci_dss_evidence_complete) / count(novapay_pci_dss_evidence_complete)",
+          "refId": "B",
+          "legendFormat": "PCI-DSS evidence",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "description": "Audit-readiness view. The assessment requires regulatory reporting support for RBI/PCI-DSS evidence and audit trails."
+    },
+    {
+      "id": 12,
+      "title": "Security Audit Log Coverage",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 29
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "targets": [
+        {
+          "expr": "100 * sum(increase(novapay_security_audit_log_total[30d])) / sum(increase(novapay_security_event_total[30d]))",
+          "refId": "A",
+          "legendFormat": "Audit log coverage",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "description": "Security-relevant audit-log coverage."
+    },
+    {
+      "id": 13,
+      "title": "Exception / Evidence Age",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 37
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "d"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "targets": [
+        {
+          "expr": "max(novapay_compliance_exception_age_days{environment=\"production\"})",
+          "refId": "A",
+          "legendFormat": "Oldest exception (days)",
+          "range": true,
+          "instant": false
+        },
+        {
+          "expr": "max(novapay_evidence_age_days{environment=\"production\"})",
+          "refId": "B",
+          "legendFormat": "Oldest evidence (days)",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "description": "Governance aging indicators."
+    },
+    {
+      "id": 14,
+      "title": "Incident & Customer Impact Evidence",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 37
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {},
+      "targets": [
+        {
+          "expr": "sum(increase(novapay_incident_total{environment=\"production\"}[30d]))",
+          "refId": "A",
+          "legendFormat": "Incidents",
+          "range": true,
+          "instant": false
+        },
+        {
+          "expr": "sum(increase(novapay_customer_impact_events_total{environment=\"production\"}[30d]))",
+          "refId": "B",
+          "legendFormat": "Customer impact",
+          "range": true,
+          "instant": false
+        }
+      ],
+      "description": "Incident and customer-impact evidence for audit review."
+    }
+  ],
+  "refresh": "5m",
+  "schemaVersion": 39,
+  "style": "dark",
+  "tags": [
+    "novapay",
+    "observability",
+    "regulatory",
+    "rbi",
+    "pci-dss",
+    "audit"
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "environment",
+        "label": "Environment",
+        "type": "query",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "query": "label_values(novapay_http_requests_total, environment)",
+        "includeAll": true,
+        "multi": true,
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        }
+      },
+      {
+        "name": "service",
+        "label": "Service",
+        "type": "query",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "query": "label_values(novapay_http_requests_total{environment=~\"$environment\"}, service)",
+        "includeAll": true,
+        "multi": true,
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        }
+      }
+    ]
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "NovaPay Regulatory \u2014 Audit-Ready Compliance",
+  "uid": "novapay-regulatory",
+  "version": 1,
+  "description": "Day 10 Deliverable 8 regulatory dashboard. Audience: compliance, risk, internal audit and authorized governance reviewers. Provides audit-ready visibility into security/compliance gates, approvals, exceptions, deployment traceability, rollback evidence, incidents and RBI/PCI-DSS evidence status.",
+  "weekStart": ""
+}
