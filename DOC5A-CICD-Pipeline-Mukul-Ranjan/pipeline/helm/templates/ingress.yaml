@@ -1,0 +1,28 @@
+{{- if and .Values.istio.enabled .Values.istio.virtualService.enabled }}
+apiVersion: networking.istio.io/v1
+kind: VirtualService
+metadata:
+  name: {{ include "novapay.fullname" . }}
+  labels:
+    {{- include "novapay.labels" . | nindent 4 }}
+spec:
+  hosts:
+    - {{ .Values.istio.virtualService.host | quote }}
+  gateways:
+    - {{ .Values.istio.gateway | quote }}
+  http:
+    - name: novapay-primary
+      route:
+        - destination:
+            host: {{ include "novapay.fullname" . }}
+            port:
+              number: {{ .Values.istio.virtualService.destinationPort }}
+            subset: blue
+          weight: {{ .Values.istio.virtualService.traffic.blue }}
+        - destination:
+            host: {{ include "novapay.fullname" . }}
+            port:
+              number: {{ .Values.istio.virtualService.destinationPort }}
+            subset: green
+          weight: {{ .Values.istio.virtualService.traffic.green }}
+{{- end }}

@@ -1,0 +1,104 @@
+{{- $root := . -}}
+{{- range $color := list "blue" "green" }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "novapay.fullname" $root }}-{{ $color }}
+  labels:
+    {{- include "novapay.labels" $root | nindent 4 }}
+    version: {{ $color }}
+spec:
+  replicas: {{ $root.Values.replicaCount }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: {{ $root.Values.rollingUpdate.maxUnavailable }}
+      maxSurge: {{ $root.Values.rollingUpdate.maxSurge }}
+  selector:
+    matchLabels:
+      {{- include "novapay.selectorLabels" $root | nindent 6 }}
+      version: {{ $color }}
+  template:
+    metadata:
+      labels:
+        {{- include "novapay.selectorLabels" $root | nindent 8 }}
+        version: {{ $color }}
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: {{ $root.Values.monitoring.serviceMonitor.path | quote }}
+        prometheus.io/port: {{ $root.Values.service.port | quote }}
+    spec:
+      serviceAccountName: {{ include "novapay.serviceAccountName" $root }}
+      terminationGracePeriodSeconds: {{ $root.Values.terminationGracePeriodSeconds }}
+      securityContext:
+        {{- toYaml $root.Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: novapay
+          image: "{{ $root.Values.image.repository }}:{{ $root.Values.image.tag }}"
+          imagePullPolicy: {{ $root.Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ $root.Values.containerPort }}
+              protocol: TCP
+          env:
+            {{- range $name, $value := $root.Values.env }}
+            - name: {{ $name }}
+              value: {{ $value | quote }}
+            {{- end }}
+            - name: NOVAPAY_DEPLOYMENT_COLOR
+              value: {{ $color | quote }}
+            - name: REDIS_HOST
+              value: {{ $root.Values.redis.host | quote }}
+            - name: REDIS_PORT
+              value: {{ $root.Values.redis.port | quote }}
+            - name: DATABASE_HOST
+              value: {{ $root.Values.database.host | quote }}
+            - name: DATABASE_PORT
+              value: {{ $root.Values.database.port | quote }}
+            - name: DATABASE_NAME
+              value: {{ $root.Values.database.name | quote }}
+            - name: DATABASE_SSL_MODE
+              value: {{ $root.Values.database.sslMode | quote }}
+          securityContext:
+            {{- toYaml $root.Values.securityContext | nindent 12 }}
+          resources:
+            {{- toYaml $root.Values.resources | nindent 12 }}
+          startupProbe:
+            httpGet:
+              path: {{ $root.Values.probes.startup.path }}
+              port: http
+            initialDelaySeconds: {{ $root.Values.probes.startup.initialDelaySeconds }}
+            periodSeconds: {{ $root.Values.probes.startup.periodSeconds }}
+            timeoutSeconds: {{ $root.Values.probes.startup.timeoutSeconds }}
+            failureThreshold: {{ $root.Values.probes.startup.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: {{ $root.Values.probes.readiness.path }}
+              port: http
+            initialDelaySeconds: {{ $root.Values.probes.readiness.initialDelaySeconds }}
+            periodSeconds: {{ $root.Values.probes.readiness.periodSeconds }}
+            timeoutSeconds: {{ $root.Values.probes.readiness.timeoutSeconds }}
+            failureThreshold: {{ $root.Values.probes.readiness.failureThreshold }}
+          livenessProbe:
+            httpGet:
+              path: {{ $root.Values.probes.liveness.path }}
+              port: http
+            initialDelaySeconds: {{ $root.Values.probes.liveness.initialDelaySeconds }}
+            periodSeconds: {{ $root.Values.probes.liveness.periodSeconds }}
+            timeoutSeconds: {{ $root.Values.probes.liveness.timeoutSeconds }}
+            failureThreshold: {{ $root.Values.probes.liveness.failureThreshold }}
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                  - /bin/sh
+                  - -c
+                  - >-
+                    {{- if $root.Values.gracefulShutdown.enabled }}
+                    sleep {{ $root.Values.gracefulShutdown.preStopSleepSeconds }};
+                    {{- end }}
+                    if [ -f /opt/novapay/bin/drain-payments.sh ]; then
+                      /opt/novapay/bin/drain-payments.sh --timeout {{ $root.Values.paymentDrain.drainTimeoutSeconds }};
+                    fi
+---
+{{- end }}

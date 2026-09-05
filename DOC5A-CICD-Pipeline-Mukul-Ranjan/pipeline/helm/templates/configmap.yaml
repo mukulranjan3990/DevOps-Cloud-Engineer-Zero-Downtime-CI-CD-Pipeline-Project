@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "novapay.fullname" . }}-config
+  labels:
+    {{- include "novapay.labels" . | nindent 4 }}
+data:
+  REDIS_TLS: {{ .Values.redis.tls | quote }}
+  FEATURE_NEW_PAYMENT_FLOW: {{ .Values.featureFlags.newPaymentFlow | quote }}
+  FEATURE_ROLLOUT_PERCENTAGE: {{ .Values.featureFlags.percentage | quote }}
+  PAYMENT_DRAIN_ENABLED: {{ .Values.paymentDrain.enabled | quote }}
+  PAYMENT_DRAIN_TIMEOUT_SECONDS: {{ .Values.paymentDrain.drainTimeoutSeconds | quote }}
+  MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"

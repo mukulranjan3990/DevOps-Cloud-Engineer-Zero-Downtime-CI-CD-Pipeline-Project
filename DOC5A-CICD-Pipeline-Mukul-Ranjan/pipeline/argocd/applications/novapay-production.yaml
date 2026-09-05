@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: novapay-production
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: novapay
+    app.kubernetes.io/part-of: novapay
+    novapay.io/environment: production
+spec:
+  project: novapay
+  source:
+    # Change repoURL to your actual Git repository URL.
+    repoURL: https://github.com/novapay/k8s-manifests.git
+    targetRevision: main
+    path: pipeline/helm/novapay
+    helm:
+      releaseName: novapay-production
+      valueFiles:
+        - values.yaml
+        - values-production.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: novapay-prod
+  syncPolicy:
+    # Production remains manual so the Release Manager and SRE Lead
+    # can approve the promotion before Argo CD syncs it.
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true

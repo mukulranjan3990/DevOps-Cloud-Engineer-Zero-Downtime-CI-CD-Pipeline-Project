@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: novapay-staging
+  namespace: argocd
+  labels:
+    app.kubernetes.io/name: novapay
+    app.kubernetes.io/part-of: novapay
+    novapay.io/environment: staging
+spec:
+  project: novapay
+  source:
+    # Change repoURL to your actual Git repository URL.
+    repoURL: https://github.com/novapay/k8s-manifests.git
+    targetRevision: main
+    path: pipeline/helm/novapay
+    helm:
+      releaseName: novapay-staging
+      valueFiles:
+        - values.yaml
+        - values-staging.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: novapay-staging
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - PrunePropagationPolicy=foreground
+      - PruneLast=true

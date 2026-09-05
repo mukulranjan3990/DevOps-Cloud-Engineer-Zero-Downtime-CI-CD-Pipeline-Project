@@ -1,0 +1,19 @@
+NovaPay Helm release: {{ .Release.Name }}
+Namespace: {{ .Release.Namespace }}
+
+Zero-downtime deployment configuration:
+- Blue/green workloads: {{ include "novapay.fullname" . }}-blue and {{ include "novapay.fullname" . }}-green
+- Istio traffic: blue={{ .Values.istio.virtualService.traffic.blue }}%, green={{ .Values.istio.virtualService.traffic.green }}%
+- Readiness/startup/liveness probes are configured.
+- Graceful shutdown and payment transaction draining are configured.
+- Redis is external/shared so sessions survive pod replacement.
+- Production uses the same immutable artifact promoted from lower environments.
+- Secrets are intentionally not stored in Helm values or manifests.
+
+Useful commands:
+  kubectl -n {{ .Release.Namespace }} get deploy,svc,pdb
+  kubectl -n {{ .Release.Namespace }} get virtualservice
+  kubectl -n {{ .Release.Namespace }} rollout status deployment/{{ include "novapay.fullname" . }}-blue
+  kubectl -n {{ .Release.Namespace }} rollout status deployment/{{ include "novapay.fullname" . }}-green
+
+For production changes, follow the approved Release Manager + SRE Lead change/approval workflow.
