@@ -8,6 +8,7 @@
 # DEV → STAGING → PRE-PROD → PRODUCTION
 #
 # Environment differences are configuration only, never application-code branches.
+---
 
 apiVersion: novapay.io/v1
 kind: EnvironmentPolicy

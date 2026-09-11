@@ -12,6 +12,7 @@
 #   Metric names must match the instrumentation deployed in the cluster.
 #   The rollback webhook/automation must be independent of the normal
 #   deployment path, as required by the assessment.
+---
 
 groups:
   - name: novapay-rollback-category-a

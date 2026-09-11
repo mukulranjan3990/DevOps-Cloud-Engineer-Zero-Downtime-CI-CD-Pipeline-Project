@@ -6,7 +6,6 @@
 #
 # IMPORTANT:
 # This file contains configuration only. Secrets must never be stored here.
-
 featureFlags:
   newPaymentFlow:
     description: "Controls the new payment processing flow."
