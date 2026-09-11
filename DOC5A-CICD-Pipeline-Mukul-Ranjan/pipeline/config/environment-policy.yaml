@@ -8,7 +8,7 @@
 # The same immutable container image is promoted through:
 # DEV → STAGING → PRE-PROD → PRODUCTION
 #
-# Environment differences are configuration only, 
+# Environment differences are configuration only
 # never application-code branches.
 
 apiVersion: novapay.io/v1
