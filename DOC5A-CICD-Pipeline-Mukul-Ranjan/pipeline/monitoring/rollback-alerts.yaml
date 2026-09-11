@@ -1,3 +1,4 @@
+---
 # NovaPay Digital Bank
 # Day 8 — Rollback Monitoring / Prometheus Alert Rules
 # File: rollback-alerts.yaml
@@ -12,7 +13,6 @@
 #   Metric names must match the instrumentation deployed in the cluster.
 #   The rollback webhook/automation must be independent of the normal
 #   deployment path, as required by the assessment.
----
 
 groups:
   - name: novapay-rollback-category-a
@@ -67,7 +67,9 @@ groups:
           environment: production
         annotations:
           summary: "NovaPay health checks failed three or more times"
-          description: "Production health checks indicate repeated application failure."
+          description: > 
+              Production health checks indicate 
+              repeated application failure.
           threshold: "3 consecutive health failures"
           action: "Immediate rollback."
 
@@ -89,7 +91,9 @@ groups:
           environment: production
         annotations:
           summary: "NovaPay production container was OOMKilled"
-          description: "A production application container has been terminated because of out-of-memory conditions."
+          description: |
+            A production application container has been terminated because
+            of out-of-memory conditions.
           threshold: "OOMKilled detected"
           action: "Immediate rollback and investigate memory regression."
 
@@ -116,7 +120,8 @@ groups:
           action: "Immediate rollback."
 
       # A5 — DB connection pool exhaustion
-      # Custom application metric expected from the DB connection pool.
+      # Custom application metric expected from the 
+      #DB connection pool.
       - alert: NovaPayDBConnectionPoolExhausted
         expr: |
           (
@@ -140,7 +145,10 @@ groups:
           environment: production
         annotations:
           summary: "NovaPay database connection pool is exhausted"
-          description: "The application has consumed all available database connections."
+          description: >
+                The application has consumed all 
+                available database connections.
+
           threshold: "Connection pool utilization >=100% for 30s"
           action: "Immediate rollback and protect database capacity."
 
@@ -159,9 +167,14 @@ groups:
           environment: production
         annotations:
           summary: "NovaPay synthetic payment transaction failed"
-          description: "A critical synthetic payment transaction is failing in production."
+          description: >
+                 A critical synthetic payment 
+                 transaction is failing in production.
+
           threshold: "Synthetic payment success == 0 for 30s"
-          action: "Immediate rollback; verify no duplicate customer transactions."
+          action: >
+                Immediate rollback; verify no 
+                duplicate customer transactions.
 
   - name: novapay-rollback-category-b
     interval: 30s
@@ -189,7 +202,10 @@ groups:
           environment: production
         annotations:
           summary: "NovaPay p99 latency exceeds 2x baseline"
-          description: "Production p99 latency has remained above twice the approved baseline for five minutes."
+          description: > 
+                Production p99 latency has remained above 
+                twice the approved baseline for five minutes.
+
           threshold: ">2x baseline for 5m"
           action: "Page on-call; correlate release and evaluate rollback."
 
@@ -223,7 +239,10 @@ groups:
           environment: production
         annotations:
           summary: "NovaPay error-budget burn exceeds 10x"
-          description: "The observed error rate is consuming the 99.9% availability error budget at more than 10x the permitted rate."
+          description: > 
+                The observed error rate is consuming the 99.9% availability 
+                error budget at more than 10x the permitted rate.
+                
           threshold: ">10x burn for 10m"
           action: "Escalate; if no response within policy window, initiate rollback."
 
@@ -244,7 +263,9 @@ groups:
           environment: production
         annotations:
           summary: "NovaPay transaction success rate is >2% below baseline"
-          description: "Business transaction success has degraded beyond the approved rollback evaluation threshold."
+          description: > 
+                Business transaction success has degraded beyond the 
+                approved rollback evaluation threshold.
           threshold: ">2% below baseline for 5m"
           action: "Page on-call; correlate deployment and payment health."
 
@@ -280,7 +301,10 @@ groups:
           environment: production
         annotations:
           summary: "NovaPay production CPU exceeds 90%"
-          description: "Application CPU consumption has remained above 90% of requested capacity."
+          description: > 
+                Application CPU consumption has remained above 
+                90% of requested capacity.
+
           threshold: ">90% for 5m"
           action: "Page on-call; investigate regression, capacity and rollback."
 
@@ -316,7 +340,9 @@ groups:
           environment: production
         annotations:
           summary: "NovaPay production memory exceeds 85%"
-          description: "Application memory usage has remained above 85% of its configured limit."
+          description: > 
+                Application memory usage has remained above 
+                85% of its configured limit.
           threshold: ">85% for 5m"
           action: "Page on-call; investigate memory growth and evaluate rollback."
 
@@ -341,7 +367,9 @@ groups:
           environment: production
         annotations:
           summary: "NovaPay pod restart activity increased"
-          description: "Pod restarts increased and should be correlated with the current release."
+          description: > 
+                Pod restarts increased and should be 
+                correlated with the current release.
           threshold: ">=3 restarts in 5m"
           action: "Correlate deployment, Git SHA, image digest and application logs."
 

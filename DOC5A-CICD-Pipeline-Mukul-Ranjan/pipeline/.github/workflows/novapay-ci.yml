@@ -59,7 +59,9 @@ jobs:
       - name: SonarQube analysis placeholder
         run: |
           echo "SonarQube scan"
-          echo "Gate: 0 critical; policy-compliant high findings; new-code debt <=5%"
+          echo "Gate: 0 critical;"
+          echo "Policy-compliant high findings;"
+          echo "New-code debt <=5%"
 
   # Stage 4 — parallel with Stage 3
   dependency-container-scan:

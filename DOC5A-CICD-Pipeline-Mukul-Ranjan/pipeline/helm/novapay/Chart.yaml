@@ -2,7 +2,10 @@
 
 apiVersion: v2
 name: novapay
-description: NovaPay banking application Helm chart for zero-downtime deployments
+description: >
+  NovaPay banking application Helm chart
+  for zero-downtime deployments
+
 type: application
 version: 0.1.0
 appVersion: "1.0.0"

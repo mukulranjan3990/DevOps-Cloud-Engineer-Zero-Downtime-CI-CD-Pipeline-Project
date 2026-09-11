@@ -1,3 +1,4 @@
+---
 # NovaPay Environment Policy
 # Day 7 — Environment Promotion Workflow
 #
@@ -7,8 +8,8 @@
 # The same immutable container image is promoted through:
 # DEV → STAGING → PRE-PROD → PRODUCTION
 #
-# Environment differences are configuration only, never application-code branches.
----
+# Environment differences are configuration only, 
+# never application-code branches.
 
 apiVersion: novapay.io/v1
 kind: EnvironmentPolicy

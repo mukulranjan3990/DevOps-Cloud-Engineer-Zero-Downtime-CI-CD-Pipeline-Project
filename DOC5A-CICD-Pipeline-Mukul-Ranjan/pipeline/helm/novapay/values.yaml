@@ -1,3 +1,4 @@
+---
 # NovaPay Helm base configuration
 # Day 7: same artifact, different configuration.
 # Shared defaults for all environments.
