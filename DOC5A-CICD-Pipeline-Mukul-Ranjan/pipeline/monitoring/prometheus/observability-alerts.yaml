@@ -114,13 +114,15 @@ spec:
             owner: sre
           annotations:
             summary: "NovaPay HTTP 5xx rate exceeds 5%"
-            description: > 
-                  HTTP 5xx error rate has exceeded 5% for at least 60 seconds.
+            description: >
+                HTTP 5xx error rate has exceeded 5% for at least 60 seconds.
             threshold: ">5% for 60s"
             rollback_action: "Trigger independent rollback path."
             runbook: "runbooks/incident-playbook.md"
             dashboard: "dashboards/grafana/engineering-dashboard.json"
-            evidence_required: "Alert ID, incident ID, deployment ID, Git SHA, timestamps and verification results."
+            evidence_required: >-
+              Alert ID, incident ID, deployment ID, Git SHA, timestamps and
+              verification results.
 
         # A2 — Three consecutive health failures
         - alert: NovaPayHealthCheckCritical
@@ -137,8 +139,9 @@ spec:
             owner: sre
           annotations:
             summary: "NovaPay health checks failed three times"
-            description: > 
-                  Three or more health-check failures were observed within the evaluation window.
+            description: >
+                  Three or more health-check failures were observed within the
+                  evaluation window.
             threshold: "3 consecutive failures"
             rollback_action: "Trigger independent rollback path."
             runbook: "runbooks/incident-playbook.md"
@@ -165,8 +168,9 @@ spec:
             owner: sre
           annotations:
             summary: "NovaPay container experienced OOMKill"
-            description: > 
-                  A NovaPay production container was restarted after an OOMKill event.
+            description: >
+                  A NovaPay production container was restarted after an OOMKill
+                  event.
             threshold: "OOMKill detected"
             rollback_action: "Trigger independent rollback path."
             runbook: "runbooks/incident-playbook.md"
@@ -189,7 +193,7 @@ spec:
             owner: sre
           annotations:
             summary: "NovaPay pod is in CrashLoopBackOff"
-            description: > 
+            description: >
                   A production NovaPay container is repeatedly failing to start.
             threshold: "CrashLoopBackOff detected"
             rollback_action: "Trigger independent rollback path."
@@ -215,10 +219,10 @@ spec:
             owner: sre
           annotations:
             summary: "NovaPay DB connection pool is exhausted"
-            description: > 
+            description: >
                   Database connection usage has reached the configured maximum.
             threshold: "Pool utilization >=100%"
-            rollback_action: > 
+            rollback_action: >
                   Trigger independent rollback path after correlation.
             runbook: "runbooks/incident-playbook.md"
 
@@ -238,10 +242,11 @@ spec:
             owner: sre
           annotations:
             summary: "Critical NovaPay synthetic payment transaction failed"
-            description: > 
-                  Synthetic monitoring detected failure of a critical payment journey.
+            description: >
+                  Synthetic monitoring detected failure of a critical payment
+                  journey.
             threshold: "Critical synthetic payment failure"
-            rollback_action: > 
+            rollback_action: >
                   Trigger independent rollback path.
             runbook: "runbooks/incident-playbook.md"
             dashboard: "dashboards/grafana/engineering-dashboard.json"
@@ -271,10 +276,11 @@ spec:
             owner: oncall
           annotations:
             summary: "NovaPay p99 latency is >2x baseline"
-            description: > 
-                  p99 latency has remained above twice the approved baseline for five minutes.
+            description: >
+                  p99 latency has remained above twice the approved baseline for
+                  five minutes.
             threshold: ">2x baseline for 5m"
-            rollback_action: > 
+            rollback_action: >
                   Escalate to on-call; rollback if policy requires.
             runbook: "runbooks/incident-playbook.md"
             dashboard: "dashboards/grafana/engineering-dashboard.json"
@@ -292,12 +298,13 @@ spec:
             owner: oncall
           annotations:
             summary: "NovaPay error-budget burn exceeds 10x"
-            description: > 
-                  Observed error rate is consuming the 99.9% availability error 
+            description: >
+                  Observed error rate is consuming the 99.9% availability error
                   budget at more than 10x the allowed rate.
             threshold: ">10x for 10m"
-            rollback_action: > 
-                  Escalate; auto-rollback if escalation policy expires without response.
+            rollback_action: >
+                  Escalate; auto-rollback if escalation policy expires without
+                  response.
             runbook: "runbooks/incident-playbook.md"
 
         # B3 — Payment transaction success >2% below baseline
@@ -317,10 +324,11 @@ spec:
             owner: oncall
           annotations:
             summary: "NovaPay payment success is >2% below baseline"
-            description: > 
-                  Payment transaction success rate is materially below its approved baseline.
+            description: >
+                  Payment transaction success rate is materially below its
+                  approved baseline.
             threshold: ">2 percentage points below baseline"
-            rollback_action: > 
+            rollback_action: >
                   Escalate and correlate with deployment/customer impact.
             runbook: "runbooks/incident-playbook.md"
 
@@ -337,10 +345,11 @@ spec:
             owner: oncall
           annotations:
             summary: "NovaPay CPU utilization exceeds 90%"
-            description: > 
-                  Average application CPU utilization has remained above 90% for five minutes.
+            description: >
+                  Average application CPU utilization has remained above 90% for
+                  five minutes.
             threshold: ">90% for 5m"
-            rollback_action: > 
+            rollback_action: >
                   Escalate; correlate with traffic and recent deployment.
             runbook: "runbooks/incident-playbook.md"
 
@@ -357,10 +366,11 @@ spec:
             owner: oncall
           annotations:
             summary: "NovaPay memory utilization exceeds 85%"
-            description: > 
-                  Application memory utilization has remained above 85% for five minutes.
+            description: >
+                  Application memory utilization has remained above 85% for
+                  five minutes.
             threshold: ">85% for 5m"
-            rollback_action: > 
+            rollback_action: >
                   Escalate; correlate with deployment and OOM risk.
             runbook: "runbooks/incident-playbook.md"
 
@@ -387,8 +397,9 @@ spec:
             service: novapay
           annotations:
             summary: "NovaPay CPU is above autoscaling trigger"
-            description: > 
-                  CPU utilization is above the assessment scenario trigger of 70%.
+            description: >
+                  CPU utilization is above the assessment scenario trigger of
+                  70%.
             threshold: ">70% for 5m"
             action: "Evaluate/allow horizontal pod autoscaling."
 
@@ -404,8 +415,9 @@ spec:
             service: messaging
           annotations:
             summary: "NovaPay queue depth exceeds 1000"
-            description: > 
-                  Queue depth is above the assessment scenario autoscaling trigger.
+            description: >
+                  Queue depth is above the assessment scenario autoscaling
+                  trigger.
             threshold: ">1000 for 5m"
             action: "Evaluate/allow horizontal scaling and consumer capacity."
 
@@ -419,10 +431,12 @@ spec:
             service: novapay
           annotations:
             summary: "NovaPay p99 latency exceeds 300ms"
-            description: > 
-                  p99 latency has exceeded the assessment scenario performance threshold.
+            description: >
+                  p99 latency has exceeded the assessment scenario performance
+                  threshold.
             threshold: ">300ms for 5m"
-            action: "Investigate performance regression and deployment correlation."
+            action: >-
+              Investigate performance regression and deployment correlation.
 
     # ================================================================
     # GROUP 5 — BUILD / CI PIPELINE
@@ -445,10 +459,12 @@ spec:
             owner: devops
           annotations:
             summary: "NovaPay build success rate is below 95%"
-            description: > 
+            description: >
                   Build success rate has remained below the assessment target.
             threshold: "<95%"
-            action: "Investigate failing/flaky tests, dependencies and build infrastructure."
+            action: >-
+              Investigate failing/flaky tests, dependencies and build
+              infrastructure.
 
         - alert: NovaPayBuildDurationAnomaly
           expr: |
@@ -463,9 +479,11 @@ spec:
             owner: devops
           annotations:
             summary: "NovaPay build duration is anomalously high"
-            description: "Current build duration is more than twice its baseline."
+            description: >-
+              Current build duration is more than twice its baseline.
             threshold: ">2x baseline for 15m"
-            action: "Investigate runner capacity, dependencies and cache behavior."
+            action: >-
+              Investigate runner capacity, dependencies and cache behavior.
 
         - alert: NovaPayFlakyTestRateHigh
           expr: |
@@ -477,7 +495,7 @@ spec:
             owner: devops
           annotations:
             summary: "NovaPay flaky test rate is above 5%"
-            description: > 
+            description: >
                   The flaky test rate has exceeded the operational threshold.
             threshold: ">5% for 30m"
             action: "Quarantine and remediate flaky tests."
@@ -521,8 +539,9 @@ spec:
             owner: security
           annotations:
             summary: "NovaPay critical security finding detected"
-            description: > 
-                  One or more critical security findings are associated with the release.
+            description: >
+                  One or more critical security findings are associated with
+                  the release.
             threshold: "Critical findings >0"
             action: "Block promotion until remediated or formally excepted."
 
@@ -556,7 +575,8 @@ spec:
             summary: "NovaPay required deployment evidence is incomplete"
             description: "Required audit evidence has not been marked complete."
             threshold: "Evidence completeness = 0"
-            action: "Complete evidence capture before closing the deployment/incident."
+            action: >-
+              Complete evidence capture before closing the deployment/incident.
 
     # ================================================================
     # GROUP 7 — DEPLOYMENT / CHANGE CORRELATION
@@ -569,7 +589,9 @@ spec:
           expr: |
             novapay:http_error_rate:5m > 0.02
             and
-            increase(novapay_deployment_total{environment="production"}[15m]) > 0
+            increase(
+              novapay_deployment_total{environment="production"}[15m]
+            ) > 0
           for: 3m
           labels:
             severity: warning
@@ -577,11 +599,12 @@ spec:
             owner: sre
           annotations:
             summary: "Error spike correlated with recent deployment"
-            description: > 
-                  Production error rate is elevated and a deployment 
+            description: >
+                  Production error rate is elevated and a deployment
                   occurred within the correlation window.
             threshold: ">2% errors with deployment in last 15m"
-            action: "Correlate Git SHA, image digest, routing state and release health."
+            action: >-
+              Correlate Git SHA, image digest, routing state and release health.
 
         - alert: NovaPayPostDeploymentLatencySpike
           expr: |
@@ -592,7 +615,9 @@ spec:
               environment="production"
             }
             and
-            increase(novapay_deployment_total{environment="production"}[15m]) > 0
+            increase(
+              novapay_deployment_total{environment="production"}[15m]
+            ) > 0
           for: 5m
           labels:
             severity: warning
@@ -600,10 +625,12 @@ spec:
             owner: sre
           annotations:
             summary: "Latency regression correlated with recent deployment"
-            description: > 
-                  p99 latency is more than twice baseline following a recent production deployment.
+            description: >
+                  p99 latency is more than twice baseline following a recent
+                  production deployment.
             threshold: ">2x baseline with deployment in last 15m"
-            action: "Inspect canary/blue-green metrics and rollback if policy requires."
+            action: >-
+              Inspect canary/blue-green metrics and rollback if policy requires.
 
         - alert: NovaPayRollbackEvent
           expr: |
@@ -618,7 +645,9 @@ spec:
           annotations:
             summary: "NovaPay rollback event detected"
             description: "A production rollback has been recorded."
-            action: "Correlate rollback ID, incident ID, release revision and verification evidence."
+            action: >-
+              Correlate rollback ID, incident ID, release revision and
+              verification evidence.
 
     # ================================================================
     # GROUP 8 — SYNTHETIC / CUSTOMER JOURNEY
@@ -649,7 +678,7 @@ spec:
             owner: oncall
           annotations:
             summary: "NovaPay synthetic payment success is below 98%"
-            description: > 
+            description: >
                   Synthetic payment journey success has degraded.
             threshold: "<98% for 5m"
             action: "Investigate customer journey and deployment correlation."
@@ -678,9 +707,12 @@ spec:
             owner: devops
           annotations:
             summary: "NovaPay pipeline duration anomaly detected"
-            description: "Pipeline duration is more than three standard deviations from its seven-day rolling baseline."
+            description: >-
+              Pipeline duration is more than three standard deviations from its
+              seven-day rolling baseline.
             threshold: ">3 standard deviations from 7-day baseline"
-            action: "Investigate build, compliance and deployment stage latency."
+            action: >-
+              Investigate build, compliance and deployment stage latency.
 
         - alert: NovaPayDeploymentFrequencyAnomaly
           expr: |
@@ -688,13 +720,17 @@ spec:
               increase(novapay_deployment_total{environment="production"}[1d])
               -
               avg_over_time(
-                increase(novapay_deployment_total{environment="production"}[1d])[7d:1d]
+                increase(
+                  novapay_deployment_total{environment="production"}[1d]
+                )[7d:1d]
               )
             )
             >
             2 *
             stddev_over_time(
-              increase(novapay_deployment_total{environment="production"}[1d])[7d:1d]
+              increase(
+                novapay_deployment_total{environment="production"}[1d]
+              )[7d:1d]
             )
           for: 1h
           labels:
@@ -703,10 +739,12 @@ spec:
             owner: devops
           annotations:
             summary: "NovaPay deployment-frequency anomaly detected"
-            description: > 
-                  Daily production deployment frequency differs materially from the recent baseline.
+            description: >
+                  Daily production deployment frequency differs materially from
+                  the recent baseline.
             threshold: ">2 standard deviations from rolling baseline"
-            action: "Review release cadence, freezes, incidents and change volume."
+            action: >-
+              Review release cadence, freezes, incidents and change volume.
 
     # ================================================================
     # GROUP 10 — SLO / AVAILABILITY
@@ -725,8 +763,9 @@ spec:
             owner: sre
           annotations:
             summary: "NovaPay availability is below the 99.9% SLO"
-            description: > 
-                  The observed availability SLI is below the NovaPay 99.9% availability objective.
+            description: >
+                  The observed availability SLI is below the NovaPay 99.9%
+                  availability objective.
             threshold: "<99.9% for 5m"
             action: "Investigate SLO burn and customer impact."
 
@@ -742,10 +781,13 @@ spec:
             owner: sre
           annotations:
             summary: "NovaPay SLO error-budget burn is critical"
-            description: > 
-                  Error-budget burn has exceeded the assessment's 10x escalation threshold.
+            description: >
+                  Error-budget burn has exceeded the assessment's 10x escalation
+                  threshold.
             threshold: ">10x for 10m"
-            action: "Escalate immediately; auto-rollback according to policy if no response."
+            action: >-
+              Escalate immediately; auto-rollback according to policy if no
+              response.
 
     # ================================================================
     # GROUP 11 — HIGH-TRAFFIC WINDOW READINESS
@@ -765,16 +807,24 @@ spec:
             category: high-traffic
             owner: devops
           annotations:
-            summary: "NovaPay high-traffic window lacks successful performance-test evidence"
-            description: > 
-                  A defined high-traffic period is active but required performance-
+            summary: >-
+              NovaPay high-traffic window lacks successful performance-test
+              evidence
+            description: >
+                  A defined high-traffic period is active but required
+                  performance-
                   test evidence is not successful.
-            threshold: "High-traffic window active and performance test != success"
-            action: "Review deployment/performance-test policy before continuing changes."
+            threshold: >-
+              High-traffic window active and performance test != success
+            action: >-
+              Review deployment/performance-test policy before continuing
+              changes.
 
         - alert: NovaPayDeploymentNearHighTrafficWindow
           expr: |
-            novapay_deployment_near_high_traffic_window{environment="production"} == 1
+            novapay_deployment_near_high_traffic_window{
+              environment="production"
+            } == 1
           for: 0s
           labels:
             severity: info
@@ -782,10 +832,12 @@ spec:
             owner: devops
           annotations:
             summary: "NovaPay deployment is near a high-traffic window"
-            description: > 
-                  Deployment timing overlaps or approaches a defined high-traffic period.
+            description: >
+                  Deployment timing overlaps or approaches a defined
+                  high-traffic period.
             threshold: "High-traffic proximity signal = 1"
-            action: "Check performance-test evidence and deployment freeze policy."
+            action: >-
+              Check performance-test evidence and deployment freeze policy.
 
     # ================================================================
     # GROUP 12 — REGULATORY INCIDENT DURATION
@@ -807,11 +859,16 @@ spec:
             owner: compliance
             action: regulatory-notification
           annotations:
-            summary: "NovaPay technology incident exceeded 30-minute reporting threshold"
-            description: > 
-                  A technology incident has exceeded the assessment scenario's 30-minute RBI reporting threshold.
+            summary: >-
+              NovaPay technology incident exceeded 30-minute reporting
+              threshold
+            description: >
+                  A technology incident has exceeded the assessment scenario's
+                  30-minute RBI reporting threshold.
             threshold: ">30 minutes"
-            action: "Start approved regulatory notification workflow and preserve evidence."
+            action: >-
+              Start approved regulatory notification workflow and preserve
+              evidence.
             runbook: "runbooks/incident-playbook.md"
             dashboard: "dashboards/grafana/regulatory-dashboard.json"
 
@@ -827,7 +884,9 @@ spec:
             owner: compliance
           annotations:
             summary: "NovaPay security audit-log coverage is incomplete"
-            description: > 
-                  Security-relevant activity is not fully represented in the expected audit trail.
+            description: >
+                  Security-relevant activity is not fully represented in the
+                  expected audit trail.
             threshold: "<100% coverage"
-            action: "Investigate logging pipeline and preserve affected evidence."
+            action: >-
+              Investigate logging pipeline and preserve affected evidence.

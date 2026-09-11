@@ -67,8 +67,8 @@ groups:
           environment: production
         annotations:
           summary: "NovaPay health checks failed three or more times"
-          description: > 
-              Production health checks indicate 
+          description: >
+              Production health checks indicate
               repeated application failure.
           threshold: "3 consecutive health failures"
           action: "Immediate rollback."
@@ -120,7 +120,7 @@ groups:
           action: "Immediate rollback."
 
       # A5 — DB connection pool exhaustion
-      # Custom application metric expected from the 
+      # Custom application metric expected from the
       #DB connection pool.
       - alert: NovaPayDBConnectionPoolExhausted
         expr: |
@@ -146,7 +146,7 @@ groups:
         annotations:
           summary: "NovaPay database connection pool is exhausted"
           description: >
-                The application has consumed all 
+                The application has consumed all
                 available database connections.
 
           threshold: "Connection pool utilization >=100% for 30s"
@@ -168,12 +168,12 @@ groups:
         annotations:
           summary: "NovaPay synthetic payment transaction failed"
           description: >
-                 A critical synthetic payment 
+                 A critical synthetic payment
                  transaction is failing in production.
 
           threshold: "Synthetic payment success == 0 for 30s"
           action: >
-                Immediate rollback; verify no 
+                Immediate rollback; verify no
                 duplicate customer transactions.
 
   - name: novapay-rollback-category-b
@@ -202,8 +202,8 @@ groups:
           environment: production
         annotations:
           summary: "NovaPay p99 latency exceeds 2x baseline"
-          description: > 
-                Production p99 latency has remained above 
+          description: >
+                Production p99 latency has remained above
                 twice the approved baseline for five minutes.
 
           threshold: ">2x baseline for 5m"
@@ -239,12 +239,13 @@ groups:
           environment: production
         annotations:
           summary: "NovaPay error-budget burn exceeds 10x"
-          description: > 
-                The observed error rate is consuming the 99.9% availability 
+          description: >
+                The observed error rate is consuming the 99.9% availability
                 error budget at more than 10x the permitted rate.
-                
+
           threshold: ">10x burn for 10m"
-          action: "Escalate; if no response within policy window, initiate rollback."
+          action: >-
+            Escalate; if no response within policy window, initiate rollback.
 
       # B3 — Transaction success >2% below baseline
       - alert: NovaPayTransactionSuccessDegraded
@@ -263,8 +264,8 @@ groups:
           environment: production
         annotations:
           summary: "NovaPay transaction success rate is >2% below baseline"
-          description: > 
-                Business transaction success has degraded beyond the 
+          description: >
+                Business transaction success has degraded beyond the
                 approved rollback evaluation threshold.
           threshold: ">2% below baseline for 5m"
           action: "Page on-call; correlate deployment and payment health."
@@ -301,8 +302,8 @@ groups:
           environment: production
         annotations:
           summary: "NovaPay production CPU exceeds 90%"
-          description: > 
-                Application CPU consumption has remained above 
+          description: >
+                Application CPU consumption has remained above
                 90% of requested capacity.
 
           threshold: ">90% for 5m"
@@ -340,11 +341,12 @@ groups:
           environment: production
         annotations:
           summary: "NovaPay production memory exceeds 85%"
-          description: > 
-                Application memory usage has remained above 
+          description: >
+                Application memory usage has remained above
                 85% of its configured limit.
           threshold: ">85% for 5m"
-          action: "Page on-call; investigate memory growth and evaluate rollback."
+          action: >-
+            Page on-call; investigate memory growth and evaluate rollback.
 
   - name: novapay-rollback-context
     interval: 30s
@@ -367,11 +369,12 @@ groups:
           environment: production
         annotations:
           summary: "NovaPay pod restart activity increased"
-          description: > 
-                Pod restarts increased and should be 
+          description: >
+                Pod restarts increased and should be
                 correlated with the current release.
           threshold: ">=3 restarts in 5m"
-          action: "Correlate deployment, Git SHA, image digest and application logs."
+          action: >-
+            Correlate deployment, Git SHA, image digest and application logs.
 
 # Recording rules used by the alert rules above.
 # Keep these in the same Prometheus rule file or load them before the alerts.
