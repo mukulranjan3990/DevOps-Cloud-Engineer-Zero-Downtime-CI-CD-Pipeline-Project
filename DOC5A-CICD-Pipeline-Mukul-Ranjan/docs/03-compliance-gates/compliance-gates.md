@@ -259,10 +259,24 @@ FAIL → VALID EXCEPTION → TEMPORARY APPROVAL → AUTO-EXPIRY → RE-EVALUATE
 - [x] Structured audit trail / JSON format
 - [x] RBI mapping
 - [x] PCI-DSS mapping
-- [ ] 3+ OPA/Rego policy files under `pipeline/policies/`
+- [x] 3+ OPA/Rego policy files under `pipeline/policies/`
 - [ ] Gate orchestration diagram
-- [ ] Git commit: `feat: compliance gate definitions with RBI/PCI-DSS mapping`
-- [ ] Git commit: `feat: OPA policy files for NovaPay`
+- [x] Git commit: `feat: compliance gate definitions with RBI/PCI-DSS mapping`
+- [x] Git commit: `feat: OPA policy files for NovaPay`
 - [ ] Push all Day 5 files
 
 **Assessment expected output:** compliance gate specifications, OPA policies and orchestration diagram (Deliverable 3). fileciteturn12file0
+
+
+
+
+---
+
+## Cross-Deliverable References
+
+- [Deliverable 1 — Pipeline Architecture](../01-pipeline-architecture/architecture.md)
+- [Deliverable 2 — Deployment Strategies](../02-deployment-strategies/deployment-strategy.md)
+- [Deliverable 4 — Database Migration](../04-database-migration/database-migration-strategy.md)
+- [Deliverable 5 — Environment Promotion](../05-environment-promotion/environment-promotion-workflow.md)
+- [Deliverable 6 — Rollback Specification](../06-rollback-specification/rollback-specification.md)
+- [Deliverable 8 — Observability](../08-observability/observability-strategy.md)

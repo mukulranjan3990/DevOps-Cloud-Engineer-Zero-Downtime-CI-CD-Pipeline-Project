@@ -1,0 +1,29 @@
+{
+  "kind": "Deployment",
+  "spec": {
+    "template": {
+      "spec": {
+        "securityContext": {
+          "runAsNonRoot": false,
+          "seccompProfile": {
+            "type": "Unconfined"
+          }
+        },
+        "containers": [
+          {
+            "name": "novapay",
+            "securityContext": {
+              "allowPrivilegeEscalation": true,
+              "privileged": true,
+              "readOnlyRootFilesystem": false,
+              "capabilities": {
+                "drop": []
+              }
+            }
+          }
+        ],
+        "serviceAccountName": "novapay"
+      }
+    }
+  }
+}

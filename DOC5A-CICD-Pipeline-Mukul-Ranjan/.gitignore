@@ -1,0 +1,12 @@
+# Terraform
+**/.terraform/
+
+# Terraform state
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+
+# Helm generated manifests
+/rendered.yaml
+/rendered-*.yaml

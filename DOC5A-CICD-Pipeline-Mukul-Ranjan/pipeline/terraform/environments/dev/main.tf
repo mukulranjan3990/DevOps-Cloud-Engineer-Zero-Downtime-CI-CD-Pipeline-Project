@@ -41,8 +41,8 @@ module "networking" {
   name         = var.name_prefix
   cluster_name = var.cluster_name
 
-  vpc_cidr            = var.vpc_cidr
-  public_subnet_cidrs = var.public_subnet_cidrs
+  vpc_cidr             = var.vpc_cidr
+  public_subnet_cidrs  = var.public_subnet_cidrs
   private_subnet_cidrs = var.private_subnet_cidrs
 
   tags = local.common_tags
@@ -59,13 +59,13 @@ module "kubernetes_cluster" {
   cluster_endpoint_private_access = true
   cluster_endpoint_public_access  = false
 
-  node_group_name          = var.node_group_name
-  node_instance_types      = var.node_instance_types
-  node_capacity_type       = "ON_DEMAND"
-  node_min_size            = var.node_min_size
-  node_desired_size        = var.node_desired_size
-  node_max_size            = var.node_max_size
-  node_disk_size           = var.node_disk_size
+  node_group_name             = var.node_group_name
+  node_instance_types         = var.node_instance_types
+  node_capacity_type          = "ON_DEMAND"
+  node_min_size               = var.node_min_size
+  node_desired_size           = var.node_desired_size
+  node_max_size               = var.node_max_size
+  node_disk_size              = var.node_disk_size
   node_update_max_unavailable = 1
 
   enable_encryption = true

@@ -5,8 +5,8 @@
 
 aws_region = "ap-south-1"
 
-name_prefix   = "novapay-dev"
-cluster_name  = "novapay-dev-eks"
+name_prefix        = "novapay-dev"
+cluster_name       = "novapay-dev-eks"
 kubernetes_version = "1.33"
 
 vpc_cidr = "10.30.0.0/16"

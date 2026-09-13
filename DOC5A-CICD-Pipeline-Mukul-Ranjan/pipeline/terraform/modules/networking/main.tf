@@ -46,10 +46,10 @@ resource "aws_subnet" "public" {
   map_public_ip_on_launch = false
 
   tags = merge(local.common_tags, {
-    Name                                      = "${var.name}-public-${local.availability_zones[count.index]}"
-    "kubernetes.io/role/elb"                  = "1"
+    Name                                        = "${var.name}-public-${local.availability_zones[count.index]}"
+    "kubernetes.io/role/elb"                    = "1"
     "kubernetes.io/cluster/${var.cluster_name}" = "shared"
-    Tier                                      = "public"
+    Tier                                        = "public"
   })
 }
 
@@ -62,10 +62,10 @@ resource "aws_subnet" "private" {
   map_public_ip_on_launch = false
 
   tags = merge(local.common_tags, {
-    Name                                           = "${var.name}-private-${local.availability_zones[count.index]}"
-    "kubernetes.io/role/internal-elb"              = "1"
-    "kubernetes.io/cluster/${var.cluster_name}"    = "shared"
-    Tier                                           = "private"
+    Name                                        = "${var.name}-private-${local.availability_zones[count.index]}"
+    "kubernetes.io/role/internal-elb"           = "1"
+    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
+    Tier                                        = "private"
   })
 }
 
@@ -107,7 +107,7 @@ resource "aws_nat_gateway" "this" {
   count = local.nat_gateway_count
 
   allocation_id = aws_eip.nat[count.index].id
-  subnet_id      = aws_subnet.public[var.single_nat_gateway ? 0 : count.index].id
+  subnet_id     = aws_subnet.public[var.single_nat_gateway ? 0 : count.index].id
 
   tags = merge(local.common_tags, {
     Name = "${var.name}-nat-${count.index + 1}"

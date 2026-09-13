@@ -1,0 +1,13 @@
+{
+  "transport": {
+    "tls_enabled": false,
+    "tls_version": "TLS1.2"
+  },
+  "storage": {
+    "encryption_enabled": false,
+    "algorithm": "AES-128"
+  },
+  "secrets": {
+    "encrypted_at_rest": false
+  }
+}

@@ -216,9 +216,11 @@ resource "aws_eks_node_group" "this" {
   disk_size      = var.node_disk_size
   instance_types = var.node_instance_types
 
-  min_size     = var.node_min_size
-  desired_size = var.node_desired_size
-  max_size     = var.node_max_size
+  scaling_config {
+    min_size     = var.node_min_size
+    desired_size = var.node_desired_size
+    max_size     = var.node_max_size
+  }
 
   labels = var.node_labels
 
@@ -248,7 +250,7 @@ resource "aws_eks_node_group" "this" {
 resource "aws_eks_addon" "vpc_cni" {
   cluster_name = aws_eks_cluster.this.name
   addon_name   = "vpc-cni"
-  most_recent  = true
+
 
   resolve_conflicts_on_create = "OVERWRITE"
   resolve_conflicts_on_update = "OVERWRITE"
@@ -259,7 +261,7 @@ resource "aws_eks_addon" "vpc_cni" {
 resource "aws_eks_addon" "coredns" {
   cluster_name = aws_eks_cluster.this.name
   addon_name   = "coredns"
-  most_recent  = true
+
 
   resolve_conflicts_on_create = "OVERWRITE"
   resolve_conflicts_on_update = "OVERWRITE"
@@ -270,7 +272,7 @@ resource "aws_eks_addon" "coredns" {
 resource "aws_eks_addon" "kube_proxy" {
   cluster_name = aws_eks_cluster.this.name
   addon_name   = "kube-proxy"
-  most_recent  = true
+
 
   resolve_conflicts_on_create = "OVERWRITE"
   resolve_conflicts_on_update = "OVERWRITE"

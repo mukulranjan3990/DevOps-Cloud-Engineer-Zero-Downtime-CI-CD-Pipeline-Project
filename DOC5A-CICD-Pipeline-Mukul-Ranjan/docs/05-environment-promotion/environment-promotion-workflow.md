@@ -577,3 +577,17 @@ Progressive rollout
 > **Build once and promote the same immutable artifact through DEV → STAGING → PRE-PROD → PRODUCTION. Change configuration, not application code. Production promotion requires all gates, required approvals, valid change controls and segregation of duties.**
 
 This document implements the assessment's **Day 7 — Environment Promotion Workflow / Deliverable 5**. fileciteturn6file0turn6file1turn6file2
+
+
+
+
+---
+
+## Cross-Deliverable References
+
+- [Deliverable 1 — Pipeline Architecture](../01-pipeline-architecture/architecture.md)
+- [Deliverable 2 — Deployment Strategies](../02-deployment-strategies/deployment-strategy.md)
+- [Deliverable 3 — Compliance Gates](../03-compliance-gates/compliance-gates.md)
+- [Deliverable 4 — Database Migration](../04-database-migration/database-migration-strategy.md)
+- [Deliverable 6 — Rollback Specification](../06-rollback-specification/rollback-specification.md)
+- [Deliverable 8 — Observability](../08-observability/observability-strategy.md)

@@ -1,4 +1,3 @@
----
 # NovaPay Helm base configuration
 # Day 7: same artifact, different configuration.
 # Shared defaults for all environments.
@@ -6,19 +5,45 @@
 
 environment: ""
 
+# ---------------------------------------------------------------------------
+# Container image
+# ---------------------------------------------------------------------------
 image:
   repository: registry.example.com/novapay/payment
   tag: ""
   digest: ""
   pullPolicy: IfNotPresent
 
+# ---------------------------------------------------------------------------
+# Application replicas and networking
+# ---------------------------------------------------------------------------
 replicaCount: 2
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+
+containerPort: 8080
 
 service:
   type: ClusterIP
   port: 8080
   targetPort: 8080
 
+terminationGracePeriodSeconds: 30
+
+# ---------------------------------------------------------------------------
+# Rolling update configuration
+# ---------------------------------------------------------------------------
+rollingUpdate:
+  maxUnavailable: 0
+  maxSurge: 1
+
+# ---------------------------------------------------------------------------
+# Resource management
+# ---------------------------------------------------------------------------
 resources:
   requests:
     cpu: "250m"
@@ -27,6 +52,104 @@ resources:
     cpu: "1000m"
     memory: "1Gi"
 
+# ---------------------------------------------------------------------------
+# Pod security
+# ---------------------------------------------------------------------------
+podSecurityContext:
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  runAsNonRoot: true
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+
+# ---------------------------------------------------------------------------
+# Environment variables
+# ---------------------------------------------------------------------------
+# Non-secret environment variables only.
+# Secrets must be injected from Vault/runtime secret management.
+env: {}
+
+# ---------------------------------------------------------------------------
+# Service account
+# ---------------------------------------------------------------------------
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: ""
+
+# ---------------------------------------------------------------------------
+# Application health probes
+# ---------------------------------------------------------------------------
+# These paths match the health configuration already defined in the
+# original base values.
+probes:
+  startup:
+    path: /health
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 30
+
+  readiness:
+    path: /ready
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+  liveness:
+    path: /health
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+
+health:
+  readinessPath: /ready
+  livenessPath: /health
+
+# ---------------------------------------------------------------------------
+# Canary / Argo Rollouts
+# ---------------------------------------------------------------------------
+canary:
+  enabled: true
+
+  phases:
+    - trafficPercent: 10
+      durationMinutes: 2
+
+    - trafficPercent: 25
+      durationMinutes: 3
+
+    - trafficPercent: 50
+      durationMinutes: 5
+
+    - trafficPercent: 75
+      durationMinutes: 5
+
+    - trafficPercent: 100
+      durationMinutes: 0
+
+# ---------------------------------------------------------------------------
+# Graceful shutdown
+# ---------------------------------------------------------------------------
+gracefulShutdown:
+  enabled: true
+  preStopSleepSeconds: 10
+
+paymentDrain:
+  drainTimeoutSeconds: 30
+
+# ---------------------------------------------------------------------------
+# Security / feature flags
+# ---------------------------------------------------------------------------
 security:
   runAsNonRoot: true
   allowPrivilegeEscalation: false
@@ -36,37 +159,91 @@ featureFlags:
   newPaymentFlow: false
   rolloutPercentage: 0
 
+# ---------------------------------------------------------------------------
+# Secrets
+# ---------------------------------------------------------------------------
+# Secret values are retrieved at runtime from Vault.
+# Never put passwords, API keys, tokens, certificates or encryption keys here.
 secrets:
   provider: vault
-  # Secret values are retrieved at runtime from Vault.
-  # Never put passwords, API keys, tokens, certificates or encryption keys here.
 
+# ---------------------------------------------------------------------------
+# Redis
+# ---------------------------------------------------------------------------
+# Non-secret connection configuration only.
+redis:
+  host: ""
+  port: 6379
+
+# ---------------------------------------------------------------------------
+# Database
+# ---------------------------------------------------------------------------
+# Non-secret connection configuration only.
 database:
-  # Non-secret connection configuration only.
   host: ""
   port: 5432
   name: novapay
+  sslMode: require
 
+# ---------------------------------------------------------------------------
+# Monitoring / Prometheus
+# ---------------------------------------------------------------------------
 monitoring:
   enabled: true
+
   metricsPath: /metrics
   metricsPort: 9090
 
+  serviceMonitor:
+    enabled: true
+    path: /metrics
+    interval: 30s
+
+# ---------------------------------------------------------------------------
+# Logging
+# ---------------------------------------------------------------------------
 logging:
   level: INFO
 
-health:
-  readinessPath: /ready
-  livenessPath: /health
+# ---------------------------------------------------------------------------
+# ArgoCD / drift detection
+# ---------------------------------------------------------------------------
+driftDetection:
+  managedBy: argocd
+  checkInterval: 3m
 
+# ---------------------------------------------------------------------------
+# Deployment
+# ---------------------------------------------------------------------------
 deployment:
   strategy: RollingUpdate
   maxUnavailable: 0
   maxSurge: 1
 
-driftDetection:
-  managedBy: argocd
-  checkInterval: 3m
-
-# Service-specific overrides can be supplied by the chart/application layer.
+# ---------------------------------------------------------------------------
+# Service-specific overrides
+# ---------------------------------------------------------------------------
 serviceOverrides: {}
+
+# ---------------------------------------------------------------------------
+# Istio traffic management
+# ---------------------------------------------------------------------------
+# Base defaults. Environment-specific values should normally override
+# host/gateway/traffic settings.
+istio:
+  enabled: true
+
+  gateway: novapay-gateway
+
+  virtualService:
+    enabled: true
+    host: novapay.example.com
+    destinationPort: 8080
+
+    traffic:
+      blue: 100
+      green: 0
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1

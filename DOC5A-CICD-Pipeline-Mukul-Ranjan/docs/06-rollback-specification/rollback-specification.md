@@ -843,3 +843,16 @@ Evidence generated
 > **Core rule:** Detect quickly, correlate the signal with the release, freeze further rollout, return traffic to the last known-good version, verify system and customer recovery, notify stakeholders, create the incident record, and complete a postmortem.
 
 This implements the assessment's **Day 8 — Rollback Specification / Deliverable 6**. fileciteturn10file0turn10file1
+
+
+
+---
+
+## Cross-Deliverable References
+
+- [Deliverable 1 — Pipeline Architecture](../01-pipeline-architecture/architecture.md)
+- [Deliverable 2 — Deployment Strategies](../02-deployment-strategies/deployment-strategy.md)
+- [Deliverable 3 — Compliance Gates](../03-compliance-gates/compliance-gates.md)
+- [Deliverable 5 — Environment Promotion](../05-environment-promotion/environment-promotion-workflow.md)
+- [Deliverable 7 — Runbook & Playbook](../07-runbook-playbook/incident-playbook.md)
+- [Deliverable 8 — Observability](../08-observability/observability-strategy.md)

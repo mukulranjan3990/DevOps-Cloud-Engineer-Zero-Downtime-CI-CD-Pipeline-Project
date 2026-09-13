@@ -1,12 +1,13 @@
 # NovaPay Deployment Strategy
 
-**Deliverable:** 2 — Deployment Strategies  
-**Day:** 4 — Deployment Strategies  
-**Primary:** Blue-Green  
-**Progressive:** Four-Phase Canary  
-**Traffic:** Kubernetes + Istio VirtualService  
-**Sessions:** Redis Cluster  
-**Observability:** Prometheus + Grafana + Alertmanager  
+**Deliverable:** 2 — Deployment Strategies
+**Day:** 4 — Deployment Strategies
+> **Implementation status:** The current Day 12 Helm/Argo Rollouts implementation operationalizes the progressive Canary strategy using stable/canary Services and Istio traffic routing. The Blue-Green strategy remains the documented primary production design and is not claimed as a second concurrent Rollout implementation in the current chart.
+**Primary:** Blue-Green
+**Progressive:** Four-Phase Canary
+**Traffic:** Kubernetes + Istio VirtualService
+**Sessions:** Redis Cluster
+**Observability:** Prometheus + Grafana + Alertmanager
 **Rollback:** Automated return to last known-good release
 
 ## 1. Day 4 Objective
@@ -606,3 +607,14 @@ docs/
 ```
 
 The assessment's expected output is a **deployment strategy document with diagrams (Deliverable 2)**. fileciteturn9file0
+
+
+---
+
+## Cross-Deliverable References
+
+- [Deliverable 1 — Pipeline Architecture](../01-pipeline-architecture/architecture.md)
+- [Deliverable 3 — Compliance Gates](../03-compliance-gates/compliance-gates.md)
+- [Deliverable 5 — Environment Promotion](../05-environment-promotion/environment-promotion-workflow.md)
+- [Deliverable 6 — Rollback Specification](../06-rollback-specification/rollback-specification.md)
+- [Deliverable 8 — Observability](../08-observability/observability-strategy.md)

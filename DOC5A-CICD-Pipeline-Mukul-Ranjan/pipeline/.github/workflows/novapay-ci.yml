@@ -1,7 +1,7 @@
 ---
 name: NovaPay CI Pipeline
 
-on:
+"on":
   pull_request:
     branches: [main]
   push:
@@ -100,23 +100,79 @@ jobs:
         run: |
           echo "Passive + active + authenticated ZAP scan"
           echo "Gate: blocking Critical/High findings = 0"
-
   # Stage 7
   policy-compliance:
     name: "7. Policy & Compliance"
     needs: dast
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
-      - name: OPA/Kyverno placeholder
-        run: echo "Evaluate Kubernetes/security policies"
-      - name: Cosign verification placeholder
-        run: echo "Verify signed image"
-      - name: Compliance gate placeholder
-        run: |
-          echo "RBI / PCI-DSS / SoD gate"
-          echo "Production bypass prohibited"
 
+      - name: Install OPA
+        uses: open-policy-agent/setup-opa@v2
+        with:
+          version: latest
+
+      - name: Validate Rego policies
+        run: |
+          opa check ./pipeline/policies/encryption.rego
+          opa check ./pipeline/policies/image-signing.rego
+          opa check ./pipeline/policies/kubernetes-security.rego
+
+      - name: OPA encryption policy gate
+        shell: bash
+        run: |
+          result=$(opa eval \
+            -d ./pipeline/policies/encryption.rego \
+            -i ./pipeline/policies/encryption-pass.json \
+            --format raw \
+            "data.novapay.compliance.encryption.allow")
+
+          echo "Encryption policy result: $result"
+
+          if [ "$result" != "true" ]; then
+            echo "BLOCK: Encryption policy failed."
+            exit 1
+          fi
+
+      - name: OPA image signing policy gate
+        shell: bash
+        run: |
+          result=$(opa eval \
+            -d ./pipeline/policies/image-signing.rego \
+            -i ./pipeline/policies/image-signing-pass.json \
+            --format raw \
+            "data.novapay.compliance.image_signing.allow")
+
+          echo "Image signing policy result: $result"
+
+          if [ "$result" != "true" ]; then
+            echo "BLOCK: Image signing policy failed."
+            exit 1
+          fi
+
+      - name: OPA Kubernetes security policy gate
+        shell: bash
+        run: |
+          result=$(opa eval \
+            -d ./pipeline/policies/kubernetes-security.rego \
+            -i ./pipeline/policies/kubernetes-security-pass.json \
+            --format raw \
+            "data.novapay.compliance.kubernetes_security.allow")
+
+          echo "Kubernetes security policy result: $result"
+
+          if [ "$result" != "true" ]; then
+            echo "BLOCK: Kubernetes security policy failed."
+            exit 1
+          fi
+
+      - name: Compliance gate
+        run: |
+          echo "OPA policy gates passed."
+          echo "RBI / PCI-DSS / SoD controls remain mandatory."
+          echo "Production bypass prohibited."
   # Stage 8
   deploy-verify:
     name: "8. Deploy & Verify"

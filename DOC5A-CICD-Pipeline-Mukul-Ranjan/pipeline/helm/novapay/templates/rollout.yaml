@@ -1,0 +1,110 @@
+{{- if .Values.canary.enabled }}
+
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+
+metadata:
+  name: {{ include "novapay.fullname" . }}
+  labels:
+    {{- include "novapay.labels" . | nindent 4 }}
+
+spec:
+  replicas: {{ .Values.replicaCount }}
+
+  revisionHistoryLimit: 5
+
+  selector:
+    matchLabels:
+      {{- include "novapay.selectorLabels" . | nindent 6 }}
+
+  strategy:
+    canary:
+
+      stableService: {{ include "novapay.fullname" . }}
+
+      canaryService: {{ include "novapay.fullname" . }}-canary
+
+      trafficRouting:
+        istio:
+          virtualService:
+            name: {{ include "novapay.fullname" . }}
+            routes:
+              - novapay-primary
+
+      steps:
+        {{- range .Values.canary.phases }}
+        - setWeight: {{ .trafficPercent }}
+        {{- if gt (int .durationMinutes) 0 }}
+        - pause:
+            duration: {{ .durationMinutes }}m
+        {{- end }}
+        {{- end }}
+
+  template:
+
+    metadata:
+      labels:
+        {{- include "novapay.selectorLabels" . | nindent 8 }}
+
+    spec:
+
+      serviceAccountName: {{ include "novapay.serviceAccountName" . }}
+
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+
+      containers:
+
+        - name: novapay
+
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+          ports:
+            - name: http
+              containerPort: {{ .Values.containerPort }}
+              protocol: TCP
+
+          env:
+            {{- range $name, $value := .Values.env }}
+            - name: {{ $name }}
+              value: {{ $value | quote }}
+            {{- end }}
+
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+
+          startupProbe:
+            httpGet:
+              path: {{ .Values.probes.startup.path }}
+              port: http
+            initialDelaySeconds: {{ .Values.probes.startup.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.startup.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.startup.timeoutSeconds }}
+            failureThreshold: {{ .Values.probes.startup.failureThreshold }}
+
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.probes.readiness.path }}
+              port: http
+            initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.readiness.timeoutSeconds }}
+            failureThreshold: {{ .Values.probes.readiness.failureThreshold }}
+
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.probes.liveness.path }}
+              port: http
+            initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.liveness.timeoutSeconds }}
+            failureThreshold: {{ .Values.probes.liveness.failureThreshold }}
+
+{{- end }}

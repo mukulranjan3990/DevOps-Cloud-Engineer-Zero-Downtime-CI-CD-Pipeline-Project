@@ -1,0 +1,8 @@
+{
+  "artifact": {
+    "image": "registry.example.com/novapay/payment",
+    "digest": "latest",
+    "signature_verified": false,
+    "signer_identity": ""
+  }
+}

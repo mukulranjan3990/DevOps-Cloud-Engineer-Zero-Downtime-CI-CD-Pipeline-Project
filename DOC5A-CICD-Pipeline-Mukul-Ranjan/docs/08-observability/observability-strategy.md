@@ -1149,3 +1149,17 @@ IMPROVE
 This connects CI/CD performance, security/compliance gates, production
 SLOs, deployment health, rollback automation, incident response and
 audit evidence into one measurable operating model.
+
+
+
+
+---
+
+## Cross-Deliverable References
+
+- [Deliverable 1 — Pipeline Architecture](../01-pipeline-architecture/architecture.md)
+- [Deliverable 2 — Deployment Strategies](../02-deployment-strategies/deployment-strategy.md)
+- [Deliverable 3 — Compliance Gates](../03-compliance-gates/compliance-gates.md)
+- [Deliverable 5 — Environment Promotion](../05-environment-promotion/environment-promotion-workflow.md)
+- [Deliverable 6 — Rollback Specification](../06-rollback-specification/rollback-specification.md)
+- [Deliverable 7 — Runbook & Playbook](../07-runbook-playbook/deployment-runbook.md)
