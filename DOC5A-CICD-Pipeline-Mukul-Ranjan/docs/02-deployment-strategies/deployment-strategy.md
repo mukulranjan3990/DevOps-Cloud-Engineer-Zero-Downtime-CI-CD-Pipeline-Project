@@ -593,7 +593,7 @@ Zero planned downtime depends on:
 - [x] Deployment topology diagrams represented in this document
 - [ ] Export standalone topology diagram files if required by your repository workflow
 - [ ] Commit: `feat: blue-green and canary deployment specifications`
-- [ ] Commit: `docs: deployment topology diagrams`
+- [x] Commit: `docs: deployment topology diagrams`
 - [ ] Push Day 4 deliverable
 
 ---
@@ -618,3 +618,7 @@ The assessment's expected output is a **deployment strategy document with diagra
 - [Deliverable 5 — Environment Promotion](../05-environment-promotion/environment-promotion-workflow.md)
 - [Deliverable 6 — Rollback Specification](../06-rollback-specification/rollback-specification.md)
 - [Deliverable 8 — Observability](../08-observability/observability-strategy.md)
+
+## AI Assistance & Attribution
+
+> **AI Assistance:** This document was developed with AI-assisted drafting and analysis. The final technical decisions, thresholds, architecture alignment, implementation details, validation, and submission responsibility remain with the project author. The primary governing source for this deliverable is the NovaPay Zero-Downtime CI/CD Pipeline Assessment provided for this project.

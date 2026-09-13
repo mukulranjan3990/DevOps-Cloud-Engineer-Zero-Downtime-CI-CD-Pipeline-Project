@@ -729,3 +729,6 @@ This is the Day 6 Deliverable 4 strategy required by the assessment.
 - [Deliverable 5 — Environment Promotion](../05-environment-promotion/environment-promotion-workflow.md)
 - [Deliverable 6 — Rollback Specification](../06-rollback-specification/rollback-specification.md)
 - [Deliverable 8 — Observability](../08-observability/observability-strategy.md)
+## AI Assistance & Attribution
+
+> **AI Assistance:** This document was developed with AI-assisted drafting and analysis. The final technical decisions, thresholds, architecture alignment, implementation details, validation, and submission responsibility remain with the project author. The primary governing source for this deliverable is the NovaPay Zero-Downtime CI/CD Pipeline Assessment provided for this project.

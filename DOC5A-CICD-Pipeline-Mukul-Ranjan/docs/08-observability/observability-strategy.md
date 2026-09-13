@@ -1163,3 +1163,6 @@ audit evidence into one measurable operating model.
 - [Deliverable 5 — Environment Promotion](../05-environment-promotion/environment-promotion-workflow.md)
 - [Deliverable 6 — Rollback Specification](../06-rollback-specification/rollback-specification.md)
 - [Deliverable 7 — Runbook & Playbook](../07-runbook-playbook/deployment-runbook.md)
+## AI Assistance & Attribution
+
+> **AI Assistance:** This document was developed with AI-assisted drafting and analysis. The final technical decisions, thresholds, architecture alignment, implementation details, validation, and submission responsibility remain with the project author. The primary governing source for this deliverable is the NovaPay Zero-Downtime CI/CD Pipeline Assessment provided for this project.

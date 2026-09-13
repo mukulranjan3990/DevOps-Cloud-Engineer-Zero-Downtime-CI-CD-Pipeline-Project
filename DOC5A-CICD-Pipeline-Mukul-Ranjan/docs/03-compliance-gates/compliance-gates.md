@@ -260,7 +260,7 @@ FAIL → VALID EXCEPTION → TEMPORARY APPROVAL → AUTO-EXPIRY → RE-EVALUATE
 - [x] RBI mapping
 - [x] PCI-DSS mapping
 - [x] 3+ OPA/Rego policy files under `pipeline/policies/`
-- [ ] Gate orchestration diagram
+- [x] Gate orchestration diagram
 - [x] Git commit: `feat: compliance gate definitions with RBI/PCI-DSS mapping`
 - [x] Git commit: `feat: OPA policy files for NovaPay`
 - [ ] Push all Day 5 files
@@ -280,3 +280,15 @@ FAIL → VALID EXCEPTION → TEMPORARY APPROVAL → AUTO-EXPIRY → RE-EVALUATE
 - [Deliverable 5 — Environment Promotion](../05-environment-promotion/environment-promotion-workflow.md)
 - [Deliverable 6 — Rollback Specification](../06-rollback-specification/rollback-specification.md)
 - [Deliverable 8 — Observability](../08-observability/observability-strategy.md)
+
+
+## Gate Orchestration Diagram
+
+The compliance gate orchestration is documented in the following repository artifacts:
+
+- [Compliance Gate Orchestration — Draw.io](./diagrams/compliance-gate-orchestration.drawio)
+- [Compliance Gate Orchestration — PNG](./diagrams/compliance-gate-orchestration.png)
+
+## AI Assistance & Attribution
+
+> **AI Assistance:** This document was developed with AI-assisted drafting and analysis. The final technical decisions, thresholds, architecture alignment, implementation details, validation, and submission responsibility remain with the project author. The primary governing source for this deliverable is the NovaPay Zero-Downtime CI/CD Pipeline Assessment provided for this project.

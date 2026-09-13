@@ -572,3 +572,7 @@ Identify which project deliverable must change.
 [ ] Final status recorded
 [ ] Required approvals completed
 ```
+
+## AI Assistance & Attribution
+
+> **AI Assistance:** This document was developed with AI-assisted drafting and analysis. The final technical decisions, thresholds, architecture alignment, implementation details, validation, and submission responsibility remain with the project author. The primary governing source for this deliverable is the NovaPay Zero-Downtime CI/CD Pipeline Assessment provided for this project.

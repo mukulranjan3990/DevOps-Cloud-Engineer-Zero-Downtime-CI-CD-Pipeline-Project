@@ -40,3 +40,6 @@ approved, traceable, and does not cause downtime.
 - [Deliverable 6 — Rollback Specification](../06-rollback-specification/rollback-specification.md) — automated rollback and recovery.
 - [Deliverable 7 — Runbook & Playbook](../07-runbook-playbook/deployment-runbook.md) — operational deployment and incident procedures.
 - [Deliverable 8 — Observability](../08-observability/observability-strategy.md) — metrics, logs, traces and SLO verification.
+## AI Assistance & Attribution
+
+> **AI Assistance:** This document was developed with AI-assisted drafting and analysis. The final technical decisions, thresholds, architecture alignment, implementation details, validation, and submission responsibility remain with the project author. The primary governing source for this deliverable is the NovaPay Zero-Downtime CI/CD Pipeline Assessment provided for this project.
