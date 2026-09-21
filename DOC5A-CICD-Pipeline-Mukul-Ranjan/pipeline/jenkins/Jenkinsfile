@@ -38,7 +38,63 @@ pipeline {
         stage('1. Source Validation') {
             steps {
                 echo 'Starting source validation...'
+                
+                sh '''  
+                    set -e
 
+                    echo "========================================"
+                    echo "JENKINS WORKSPACE DIAGNOSTICS"
+                    echo "========================================"
+
+                    echo "Current directory:"
+                    pwd
+
+                    echo
+                    echo "WORKSPACE:"
+                    echo "${WORKSPACE}"
+
+                    echo
+                    echo "Top-level contents:"
+                    ls -la
+
+                    echo
+                    echo "Repository contents:"
+                    find . -maxdepth 3 -type f | sort | head -200
+
+                    echo
+                    echo "Expected repository structure:"
+
+                    if [ -f pipeline/.github/workflows/novapay-ci.yml ]; then
+                        echo "PASS: pipeline/.github/workflows/novapay-ci.yml"
+                    else
+                        echo "FAIL: pipeline/.github/workflows/novapay-ci.yml"
+                    fi
+
+                    if [ -f pipeline/jenkins/Jenkinsfile ]; then
+                        echo "PASS: pipeline/jenkins/Jenkinsfile"
+                    else
+                        echo "FAIL: pipeline/jenkins/Jenkinsfile"
+                    fi
+
+                    if [ -d pipeline/helm/novapay ]; then
+                        echo "PASS: pipeline/helm/novapay"
+                    else
+                        echo "FAIL: pipeline/helm/novapay"
+                    fi
+
+                    if [ -d pipeline/terraform ]; then
+                        echo "PASS: pipeline/terraform"
+                    else
+                        echo "FAIL: pipeline/terraform"
+                    fi
+
+                    if [ -d pipeline/policies ]; then
+                        echo "PASS: pipeline/policies"
+                    else
+                        echo "FAIL: pipeline/policies"
+                    fi
+                '''
+               
                 sh '''
                     set -e
 
