@@ -17,6 +17,7 @@ pipeline {
     }
 
     environment {
+        PROJECT_ROOT = 'DOC5A-CICD-Pipeline-Mukul-Ranjan'
         JAVA_VERSION = '21'
         IMAGE_NAME   = 'novapay-payment'
 
@@ -37,80 +38,52 @@ pipeline {
         // ================================================================
         stage('1. Source Validation') {
             steps {
+
+              dir("${PROJECT_ROOT}") {
                 echo 'Starting source validation...'
                 
-                sh '''  
+                sh '''
                     set -e
 
                     echo "========================================"
-                    echo "JENKINS WORKSPACE DIAGNOSTICS"
+                    echo "NOVA PAY SOURCE VALIDATION"
                     echo "========================================"
 
                     echo "Current directory:"
                     pwd
 
                     echo
-                    echo "WORKSPACE:"
+                    echo "Workspace:"
                     echo "${WORKSPACE}"
 
                     echo
-                    echo "Top-level contents:"
-                    ls -la
-
-                    echo
-                    echo "Repository contents:"
-                    find . -maxdepth 3 -type f | sort | head -200
-
-                    echo
-                    echo "Expected repository structure:"
-
-                    if [ -f pipeline/.github/workflows/novapay-ci.yml ]; then
-                        echo "PASS: pipeline/.github/workflows/novapay-ci.yml"
-                    else
-                        echo "FAIL: pipeline/.github/workflows/novapay-ci.yml"
-                    fi
-
-                    if [ -f pipeline/jenkins/Jenkinsfile ]; then
-                        echo "PASS: pipeline/jenkins/Jenkinsfile"
-                    else
-                        echo "FAIL: pipeline/jenkins/Jenkinsfile"
-                    fi
-
-                    if [ -d pipeline/helm/novapay ]; then
-                        echo "PASS: pipeline/helm/novapay"
-                    else
-                        echo "FAIL: pipeline/helm/novapay"
-                    fi
-
-                    if [ -d pipeline/terraform ]; then
-                        echo "PASS: pipeline/terraform"
-                    else
-                        echo "FAIL: pipeline/terraform"
-                    fi
-
-                    if [ -d pipeline/policies ]; then
-                        echo "PASS: pipeline/policies"
-                    else
-                        echo "FAIL: pipeline/policies"
-                    fi
-                '''
-               
-                sh '''
-                    set -e
-
                     echo "=== Git Status ==="
                     git status --short
 
+                    echo
                     echo "=== Repository Validation ==="
 
                     test -f pipeline/.github/workflows/novapay-ci.yml
+                    echo "PASS: GitHub Actions workflow"
+
+                    test -f pipeline/jenkins/Jenkinsfile
+                    echo "PASS: Jenkinsfile"
+
                     test -d pipeline/helm/novapay
+                    echo "PASS: Helm chart"
+
                     test -d pipeline/terraform
+                    echo "PASS: Terraform configuration"
+
                     test -d pipeline/policies
+                    echo "PASS: OPA policies"
 
-                    echo "Required project structure exists."
-                '''
-
+                    echo
+                    echo "========================================"
+                    echo "SOURCE VALIDATION PASSED"
+                    echo "========================================"
+               '''
+            
                 sh '''
                     set -e
 
@@ -120,6 +93,7 @@ pipeline {
 
                     echo "YAML validation passed."
                 '''
+              }
             }
         }
 
@@ -129,6 +103,7 @@ pipeline {
         // ================================================================
         stage('2. Build & Unit Test') {
             steps {
+              dir("${PROJECT_ROOT}") {   
                 echo 'Building NovaPay application and running unit tests...'
 
                 sh '''
@@ -153,6 +128,7 @@ pipeline {
                         echo "Pipeline infrastructure validation continues."
                     fi
                 '''
+              }  
             }
         }
 
@@ -162,20 +138,24 @@ pipeline {
         // ================================================================
         stage('3. SAST') {
             steps {
-                echo 'Running Static Application Security Testing...'
 
-                sh '''
-                    set -e
+                dir("${PROJECT_ROOT}") {
+                    echo 'Running Static Application Security Testing...'
 
-                    echo "=== SonarQube SAST ==="
+                    sh '''
+                        set -e
 
-                    if command -v sonar-scanner >/dev/null 2>&1; then
-                        sonar-scanner
-                    else
-                        echo "SonarScanner is not installed on this Jenkins agent."
-                        echo "Configure SonarQube/SonarScanner in Jenkins for execution."
-                    fi
-                '''
+                        echo "=== SonarQube SAST ==="
+
+                        if command -v sonar-scanner >/dev/null 2>&1; then
+                            sonar-scanner
+                        else
+                            echo "SonarScanner is not installed on this Jenkins agent."
+                            echo "Configure SonarQube/SonarScanner in Jenkins for execution."
+                        fi
+                    '''
+                }
+               
             }
         }
 
@@ -185,7 +165,8 @@ pipeline {
         // ================================================================
         stage('4. Dependency & Container Scanning') {
             steps {
-                echo 'Running dependency and container security checks...'
+                dir("${PROJECT_ROOT}") {
+                    echo 'Running dependency and container security checks...'
 
                 sh '''
                     set -e
@@ -224,6 +205,7 @@ pipeline {
                         echo "Docker is not available on this Jenkins agent."
                     fi
                 '''
+              }  
             }
         }
 
@@ -233,7 +215,8 @@ pipeline {
         // ================================================================
         stage('5. Integration & Contract Testing') {
             steps {
-                echo 'Running integration and contract tests...'
+                dir("${PROJECT_ROOT}") {
+                    echo 'Running integration and contract tests...'
 
                 sh '''
                     set -e
@@ -251,6 +234,7 @@ pipeline {
                         echo "Integration/contract execution requires the application test suite."
                     fi
                 '''
+                }
             }
         }
 
@@ -260,6 +244,7 @@ pipeline {
         // ================================================================
         stage('6. DAST') {
             steps {
+                dir("${PROJECT_ROOT}") {
                 echo 'Running Dynamic Application Security Testing...'
 
                 sh '''
@@ -278,6 +263,7 @@ pipeline {
                         echo "Configure ZAP and DAST_TARGET before enforcement."
                     fi
                 '''
+             }
             }
 
             post {
@@ -296,6 +282,7 @@ pipeline {
         // ================================================================
         stage('7. Policy & Compliance Gates') {
             steps {
+                dir("${PROJECT_ROOT}") {
                 echo 'Executing OPA policy and compliance gates...'
 
                 sh '''
@@ -348,6 +335,7 @@ pipeline {
                     echo "Terraform formatting validation passed."
                 '''
             }
+            }
         }
 
 
@@ -356,6 +344,7 @@ pipeline {
         // ================================================================
         stage('8. Deployment & Verification') {
             steps {
+                dir("${PROJECT_ROOT}") {
                 echo 'Starting deployment verification...'
 
                 sh '''
@@ -384,6 +373,7 @@ pipeline {
                 Production deployment uses the approved immutable artifact
                 with progressive canary verification and rollback controls.
                 '''
+            }
             }
         }
     }
