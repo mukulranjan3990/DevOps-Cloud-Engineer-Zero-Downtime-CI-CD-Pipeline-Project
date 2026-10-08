@@ -1,0 +1,17 @@
+name: novapay CI/CD pipeline
+on: 
+  workflow_dispatch:
+    inputs:
+      enviorments:
+         description: 'enviorment to deploy'
+         required: true
+         default: 'staging'
+
+jobs:
+  Testing:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Testing workflow
+        run: echo "workflow works!"
+        
+         
