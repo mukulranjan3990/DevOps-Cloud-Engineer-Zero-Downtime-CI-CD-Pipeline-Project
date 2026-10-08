@@ -19,7 +19,7 @@ jobs:
         with:
           file_or_dir: .
           config_data: |
-            extend: default
+            extends: default
             ignore: |
               **/templates/
               charts
